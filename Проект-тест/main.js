@@ -10,3 +10,4 @@ animation.drawGraph();
 new Slider("setKineticEnergy", "kineticEnergy", "Кинетическая энергия");
 new Slider("setSpeed", "getSpeed", "Скорость", 20);
 new Slider("setLength", "getLength", "Длина", 0.9);
+new Slider("setGravity", "getGravity", "Ускорение свободного падения", 2000);

@@ -60,7 +60,7 @@ class Pendulum{
 		for (let a in this.sliders){
 			this.sliders[a].setter();
 		}
-		animation.graphLine(this.time * 0.05, this.fullE() * 5);
+		animation.graphLine(this.time * 0.05, (this.x - 500) * 0.05);
 		if (this.y < this.ymin){
 			this.ymin = this.y;
 		}
@@ -128,6 +128,16 @@ class Pendulum{
 		this.y = this.xyCopy.y;
 		this.length = num;
 		this.snap(num)
+	}
+
+	getGravity(){
+		return this.gravity.length();
+	}
+
+	setGravity(num){
+		this.gravity.y = num;
+		this.fullEnergy = this.fullE();
+		this.getGravity();
 	}
 
 	setKineticEnergy(num){

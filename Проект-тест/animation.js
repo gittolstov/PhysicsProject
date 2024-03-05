@@ -51,12 +51,15 @@ class Animation{
 		this.gy = -y + 250;
 	}
 	
-	vector(x, y, x2, y2, color){
+	vector(x, y, x2, y2, color, x3=0, y3=0, x4=0, y4=0){
 		this.masterCanvas.beginPath();
 		this.masterCanvas.strokeStyle = color;
 		this.masterCanvas.lineWidth = 2;
 		this.masterCanvas.moveTo(x, y);
 		this.masterCanvas.lineTo(x + x2, y + y2);
+		this.masterCanvas.lineTo(x + x3, y + y3);
+		this.masterCanvas.moveTo(x + x2, y + y2);
+		this.masterCanvas.lineTo(x + x4, y + y4);
 		this.masterCanvas.stroke();
 	}
 }

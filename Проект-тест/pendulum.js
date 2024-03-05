@@ -1,5 +1,5 @@
 class Pendulum{
-	constructor(gravity = new Vector(0, 0.05, "red"), tension = new Vector(0, -0.05, "green"), frame = 20, speed = new Vector(5, 0, "red", 100), acc = new Vector(0, 0, "blue")){
+	constructor(gravity = new Vector(0, 0.05, "red", undefined, 5), tension = new Vector(0, -0.05, "green", undefined, 5), frame = 20, speed = new Vector(5, 0, "red", 40), acc = new Vector(0, 0, "blue", 1000, 8)){
 		this.x = 500;
 		this.y = 500;
 		this.speed = speed;
@@ -60,7 +60,7 @@ class Pendulum{
 		for (let a in this.sliders){
 			this.sliders[a].setter();
 		}
-		animation.graphLine(this.time * 0.05, (this.x - 500) * 0.05);
+		animation.graphLine(this.time * 0.1, (this.x - 500) * 0.1);
 		if (this.y < this.ymin){
 			this.ymin = this.y;
 		}
@@ -81,10 +81,19 @@ class Pendulum{
 		animation.refresh();
 		animation.drawPendulum(this.x, this.y, this.size);
 		this.speed.draw();
-		this.acceleration.draw();
+		this.tangentAcceleration().draw();
 		this.gravity.draw();
 		this.tension.draw();
 		this.drawPlaceholder1();
+	}
+
+	tangentAcceleration(){
+		let a = new Vector(-this.direction * this.y, this.direction * (this.x - 500));
+		let b = this.acceleration.copy();
+		b.x = a.x;
+		b.y = a.y;
+		b.multiply((a.x * this.acceleration.x + a.y * this.acceleration.y) / a.length());
+		return b;
 	}
 
 	drawPlaceholder1(){
@@ -184,11 +193,18 @@ class Pendulum{
 
 
 class Vector{
-	constructor(x, y, color = "green", drawMultiplier = 500){
+	constructor(x, y, color = "green", drawMultiplier = 500, arrowHead = 20, arrowType = "add"){
 		this.x = x;
 		this.y = y;
 		this.color = color;
 		this.drawMultiplier = drawMultiplier;
+		this.arrowHead = arrowHead;
+		this.arrowType = arrowType;
+		if (arrowType === "add"){
+			this.arrow = this.arrow2;
+		} else {
+			this.arrow = this.arrow1;
+		}
 	}
 	
 	point(x, y){//направляет вектор в заданную координату с сохранением модуля
@@ -210,11 +226,27 @@ class Vector{
 	}
 
 	draw(){
-		animation.vector(PENDULUM.x, PENDULUM.y, this.x * this.drawMultiplier, this.y * this.drawMultiplier, this.color);
+		let a = this.arrow();
+		animation.vector(PENDULUM.x, PENDULUM.y, this.x * this.drawMultiplier, this.y * this.drawMultiplier, this.color, a.x1 * this.drawMultiplier, a.y1 * this.drawMultiplier, a.x2 * this.drawMultiplier, a.y2 * this.drawMultiplier);
 	}
 
 	copy(){
-		return new Vector(this.x, this.y, this.color, this.drawMultiplier);
+		return new Vector(this.x, this.y, this.color, this.drawMultiplier, this.arrowHead, this.arrowType);
+	}
+
+	arrow(){
+	}
+
+	arrow1(){
+
+	}
+
+	arrow2(){
+		let a = this.copy();
+		let b = this.copy();
+		a.multiply(this.length() - this.arrowHead / this.drawMultiplier);
+		b.multiply(this.arrowHead / this.drawMultiplier);
+		return {x1: a.x + b.y, y1: a.y - b.x, x2: a.x - b.y, y2: a.y + b.x};
 	}
 }
 

@@ -1,8 +1,13 @@
 class Vector:
-    def __init__(self, x, y):
+    def __init__(self, x, y, backlink=None):
+        if backlink is not None:
+            self.backlink = backlink
         self.x = x
         self.y = y
         self.force_applications = []#all vectors in this list will be added to current vector every tick AKA force
+
+    def draw(self, animator):
+        pass
 
     def tick_move(self):
         self.tick1()
@@ -22,6 +27,10 @@ class Vector:
     def tick4(self):
         pass
 
+    def zero_out(self):
+        self.x = 0
+        self.y = 0
+
     def copy_coordinates(self):
         return Vector(self.x, self.y)
 
@@ -40,6 +49,11 @@ class Vector:
     def length(self):
         return (self.x ** 2 + self.y ** 2)**0.5
 
+    def set_length(self, length):
+        a = projections(self.x, self.y, length)
+        self.x = a["x"]
+        self.y = a["y"]
+
     def turn_to(self, x, y):
         a = projections(x, y, self.length())
         self.x = a["x"]
@@ -55,8 +69,6 @@ class Vector:
         self.x = self.y * direction
         self.y = -aux * direction
 
-    def draw(self, x, y, color):
-        pass
 
 def projections(a, b, hypothesis):
     if a == 0 and b == 0:
@@ -70,8 +82,3 @@ def projections(a, b, hypothesis):
         "x": y * a / b,
         "y": y
     }
-
-
-a = Vector(-2, -1)
-a.get_perpendicular(1)
-print(a.x, a.y)

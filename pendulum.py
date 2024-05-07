@@ -13,8 +13,11 @@ class Pendulum(Vector):#representation of pendulum in memory
         self.mark_forces(self.speed)
 
     def draw(self, animator):
-        print(self.x + self.starting_point_x, self.y + self.starting_point_y)
+        #print(self.x + self.starting_point_x, self.y + self.starting_point_y)
         #animator.goto(self.x + self.starting_point_x, self.y + self.starting_point_y)
+        draw_string = ""
+        draw_string += animator.circle(self.x, self.y, 25)
+        return draw_string
 
     def tick2(self):
         self.model_implications()

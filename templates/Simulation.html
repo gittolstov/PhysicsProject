@@ -1,0 +1,28 @@
+<html lang="ru">
+	<head>
+		<title>Симуляция - маятник</title>
+	</head>
+	<body>
+		<div style="display: flex; margin:4%">
+			<div style="margin: 3% 3%;">
+				<canvas style="border: 10px solid grey; width: 1000; height: 1000;" width=1000 height=1000 id="main"></canvas>
+			</div>
+			<div style="margin: 3% 3%;">
+				<div style="font-family: sans-serif; padding: 5px; border: 10px solid grey; width: 500; height: 500; display: block;" id="stats" onmouseup="keyUp();">
+					
+				</div>
+				<div>
+					<canvas style="padding: 15px; width: 500px; height: 500px;" width=500 height=500 id="graph"></canvas>
+				</div>
+			</div>
+			<div style="margin: 3% 3%;">
+				<p style="text-align: center"><button onclick="new Log(0.05, 10);">Начать запись</button></p>
+				<p style="text-align: center"><button onclick="PENDULUM.butn();" id="butn">Запустить маятник</button></p>
+			</div>
+		</div>
+		<script src='{{url_for("static", filename="animation2.js")}}'></script>
+		<script src='{{url_for("static", filename="sliders.js")}}'></script>
+		<script src='{{url_for("static", filename="Formulas.js")}}'></script>
+		<script src='{{url_for("static", filename="main.js")}}'></script>
+	</body>
+</html>

@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, flash, url_for, session
-#from flask_cors import CORS, cross_origin
+from flask_cors import CORS, cross_origin
 from pendulum import *
 import threading
 import turtle
@@ -7,7 +7,7 @@ import turtle
 
 app = Flask(__name__)
 app.secret_key = "Jxtym_ctrhtnysq_rk.x_cghznfyysq_jn_dim-akim"
-#CORS(app, support_credentials=True)
+CORS(app, support_credentials=True)
 
 
 @app.route("/")
@@ -30,10 +30,10 @@ def ret():
     return str(main.model.full_energy)
 
 
-@app.route('/fetch_visuals', methods=["POST"])
+@app.route('/event', methods=["POST"])
 #@cross_origin(supports_credentials=True)
-def login():
-    print(request)
+def pst():
+    main.handle_event(request.data.decode('ascii'));
     return "succ"
 
 
@@ -44,19 +44,32 @@ class Main:
         self.animator = Animator()
         self.vectors = []
         self.tickrate = tickrate
+        self.paused = True
         self.to_draw = ""
         self.model = None
+
+    def handle_event(self, event):
+        if event == "pause":
+            self.paused = not self.paused
+        elif event == "only_pause":
+            self.paused = True
+        elif event.startswith("slider"):
+            parsed = event.split(" ")
+            print(parsed)
+            bar = getattr(self.model, parsed[1])
+            bar(float(parsed[2]))
 
     def set_timeout(self):
         self.timer = threading.Timer(1 / self.tickrate, self.tick_move, args=None, kwargs=None)
         self.timer.start()
 
     def tick_move(self):
-        for i in self.vectors:
-            i.tick_move()
-            #i.draw(self.turtle)
+        if not self.paused:
+            for i in self.vectors:
+                i.tick_move()
+                #i.draw(self.turtle)
+            self.to_draw = self.model.draw(self.animator)
         self.set_timeout()
-        self.to_draw = self.model.draw(self.animator)
 
     # def run(self):
     #     while not self.stopped.wait(0.5):

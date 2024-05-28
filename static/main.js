@@ -10,8 +10,36 @@ setInterval(() => {
     animation.drawGraph1();
 }, 50);
 
-/*new Slider("setKineticEnergy", "kineticEnergy", "Кинетическая энергия");
-new Slider("setSpeed", "getSpeed", "Скорость", 20);
+let sendMyData = function (something) {
+    let url = '/event';
+    fetch(url, {
+        method: "post",
+        headers: {
+        'Accept': 'text/html',
+        'Content-Type': 'text/html'
+        },
+        body: something
+    })
+    .then( (response) => {
+        //do something awesome that makes the world a better place
+    });
+}
+
+let slidersList = [];
+
+function receiveSliders(){
+    let url = '/sliders';
+    fetch(url)
+    .then(function(response) {
+        return response.text();
+    })
+    .then(function(text) {
+
+    })
+}
+
+new Slider("hardset_kinetic_energy", "kineticEnergy", "Кинетическая энергия");
+/*new Slider("setSpeed", "getSpeed", "Скорость", 20);
 new Slider("setLength", "getLength", "Длина", 0.9);
 new Slider("setGravity", "getGravity", "Ускорение свободного падения", 2000);
 
@@ -24,23 +52,6 @@ let getMyData = function () {
     .then(function(json) {
         console.log('Request successful', json.funni_json);
     })
-}
-
-let sendMyData = function () {
-    let url = '/fetch_visuals';
-    fetch("http://example.com/api/endpoint/", {
-        method: "post",
-        headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            name: "aboba"
-        })
-    })
-    .then( (response) => {
-        //do something awesome that makes the world a better place
-    });
 }
 
 let elem = document.getElementById('aaa')

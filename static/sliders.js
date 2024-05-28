@@ -1,12 +1,12 @@
 class Slider{
 	constructor(modify, set, text, modifier = 10){
-		/*this.id = PENDULUM.sliders.push(this) - 1;
+		this.id = slidersList.push(this) - 1;
 		this.modify = modify;
 		this.modifieR = modifier;
 		this.set = set;
 		this.value = 0;
 		this.active = false;
-		document.getElementById(this.id + "b").innerText = text;*/
+		document.getElementById(this.id + "b").innerText = text;
 	}
 
 	react(num){
@@ -17,32 +17,29 @@ class Slider{
 	}
 
 	modifier(num){
-		PENDULUM[this.modify](num);
-		PENDULUM.draw();
-		for (let a in PENDULUM.sliders){
-			PENDULUM.sliders[a].setter();
+		sendMyData("slider " + this.modify + " " + num);
+		for (let a in slidersList){
+			//slidersList[a].setter();
 		}
 	}
 
-	setter(){
-		document.getElementById("" + this.id).style.left = PENDULUM[this.set]() * this.modifieR + 5;
-	}
+	//TODO make sliders receive data
 }
 
 
 function mouseMoveHandler(id){
-	if (PENDULUM.sliders[id] === undefined){return}
-	PENDULUM.sliders[id].react(Math.abs(event.offsetX) * 10);
+	if (slidersList[id] === undefined){return}
+	slidersList[id].react(Math.abs(event.offsetX) * 10);
 }
 
 function keyUp(){
-	for (let a in PENDULUM.sliders){
-		PENDULUM.sliders[a].active = false;
+	for (let a in slidersList){
+		slidersList[a].active = false;
 	}
 	//PENDULUM.start();
 }
 
 function keyDown(id){
-	PENDULUM.sliders[id].active = true;
-	PENDULUM.stop();
+	slidersList[id].active = true;
+	sendMyData('only_pause');
 }

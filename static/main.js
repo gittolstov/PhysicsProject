@@ -4,6 +4,11 @@ for (let a = 0; a < 9; a++){
 }
 
 let animation = new Animation();
+animation.drawGraph();
+setInterval(() => {
+    animation.receiveData();
+    animation.drawGraph1();
+}, 50);
 
 /*new Slider("setKineticEnergy", "kineticEnergy", "Кинетическая энергия");
 new Slider("setSpeed", "getSpeed", "Скорость", 20);

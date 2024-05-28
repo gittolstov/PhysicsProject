@@ -16,8 +16,18 @@ def pend():
 
 
 @app.route("/get_data")
-def ret():
+def ret1():
     return main.to_draw
+
+
+@app.route("/get_kinetic")
+def ret2():
+    return str(main.model.get_kinetic_energy())
+
+
+@app.route("/get_potential")
+def ret():
+    return str(main.model.full_energy)
 
 
 @app.route('/fetch_visuals', methods=["POST"])
@@ -28,7 +38,7 @@ def login():
 
 
 class Main:
-    def __init__(self, tickrate=50):
+    def __init__(self, tickrate=150):
         #self.turtle = turtle.Turtle()
         #self.turtle.shape("circle")
         self.animator = Animator()
@@ -48,10 +58,10 @@ class Main:
         self.set_timeout()
         self.to_draw = self.model.draw(self.animator)
 
-    def run(self):
-        while not self.stopped.wait(0.5):
-            print("my thread")
-            # call a function
+    # def run(self):
+    #     while not self.stopped.wait(0.5):
+    #         print("my thread")
+    #         # call a function
 
     def add_model(self, model):
         self.vectors.extend(model.get_working_vectors())
@@ -64,11 +74,11 @@ class Animator:
         """line = 1"""
         pass
 
-    def circle(self, x, y, radius):
-        return f"0 {x} {y} {radius};"
+    def circle(self, x, y, radius, width, color):
+        return f"0 {x} {y} {radius} {width} {color};"
 
-    def line(self, x1, y1, x2, y2):
-        return f"1 {x1} {y1} {x2} {y2};"
+    def line(self, x1, y1, x2, y2, width, color):
+        return f"1 {x1} {y1} {x2} {y2} {width} {color};"
 
 
 if __name__ == "__main__":
@@ -76,4 +86,7 @@ if __name__ == "__main__":
     main = Main()
     main.add_model(PENDULUM)
     main.set_timeout()
+    print(PENDULUM.get_potential_energy())
+    print(PENDULUM.get_kinetic_energy())
+    print(PENDULUM.full_energy)
     app.run(host='0.0.0.0', debug=True)

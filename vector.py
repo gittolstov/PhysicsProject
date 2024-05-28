@@ -45,6 +45,9 @@ class Vector:
         for a in self.force_applications:
             self.x += a.x
             self.y += a.y
+            for b in a.force_applications:
+                self.x += b.x ** 2 / 2
+                self.y += b.y ** 2 / 2
 
     def length(self):
         return (self.x ** 2 + self.y ** 2)**0.5
@@ -64,7 +67,7 @@ class Vector:
         self.x = a["x"]
         self.y = a["y"]
 
-    def get_perpendicular(self, direction):#if direction = 1 spins vector clockwise, if -1 - counterclockwise
+    def get_perpendicular(self, direction):#if direction = 1 spins vector counterclockwise, if -1 - clockwise
         aux = self.x
         self.x = self.y * direction
         self.y = -aux * direction

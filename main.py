@@ -20,20 +20,34 @@ def ret1():
     return main.to_draw
 
 
-@app.route("/get_kinetic")
+@app.route("/get_sliders")
 def ret2():
+    return main.model.sliders
+
+
+@app.route("/get_kinetic")
+def ret3():
     return str(main.model.get_kinetic_energy())
 
 
 @app.route("/get_potential")
-def ret():
+def ret4():
     return str(main.model.full_energy)
+
+
+@app.route("/speed_graph")
+def ret5():
+    a = ""
+    sh = main.model.log["speed"]
+    for i in range(main.model.time):
+        a += str((sh["x"][i]**2 + sh["y"][i]**2)**0.5 * sh["x"][i] / abs(sh["x"][i])) + " "
+    return a
 
 
 @app.route('/event', methods=["POST"])
 #@cross_origin(supports_credentials=True)
 def pst():
-    main.handle_event(request.data.decode('ascii'));
+    main.handle_event(request.data.decode('ascii'))
     return "succ"
 
 
@@ -68,7 +82,7 @@ class Main:
             for i in self.vectors:
                 i.tick_move()
                 #i.draw(self.turtle)
-            self.to_draw = self.model.draw(self.animator)
+        self.to_draw = self.model.draw(self.animator)
         self.set_timeout()
 
     # def run(self):

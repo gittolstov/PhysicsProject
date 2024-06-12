@@ -4,13 +4,17 @@ for (let a = 0; a < 9; a++){
 }
 
 let animation = new Animation();
-animation.drawGraph();
+//animation.drawGraph();
 setInterval(() => {
-    animation.receiveData();
-    animation.drawGraph1();
+	animation.receiveData();
+	//animation.drawGraph1();
+	receiveSliders();
+	for (let a in slidersList){
+		slidersList[a].setter();
+	}
 }, 50);
 
-let sendMyData = function (something) {
+function sendMyData(something){
     let url = '/event';
     fetch(url, {
         method: "post",
@@ -26,24 +30,44 @@ let sendMyData = function (something) {
 }
 
 let slidersList = [];
+let slidersReceived = {}
 
 function receiveSliders(){
-    let url = '/sliders';
-    fetch(url)
-    .then(function(response) {
-        return response.text();
-    })
-    .then(function(text) {
-
-    })
+	let url = '/get_sliders';
+	fetch(url)
+	.then(function(response) {
+		return response.text();
+	})
+	.then(function(text) {
+		let a = text.split(";");
+		for (let i in a){
+			let b = a[i].split(" ");
+			slidersReceived[b[0]] = parseFloat(b[1]);
+		}
+	})
 }
 
-new Slider("hardset_kinetic_energy", "kineticEnergy", "Кинетическая энергия");
-/*new Slider("setSpeed", "getSpeed", "Скорость", 20);
-new Slider("setLength", "getLength", "Длина", 0.9);
-new Slider("setGravity", "getGravity", "Ускорение свободного падения", 2000);
+function speedGraph(){
+	let url = '/speed_graph';
+	fetch(url)
+	.then(function(response) {
+		return response.text();
+	})
+	.then(function(text) {
+		let a = text.split(" ");
+		animation.drawGraph();
+		for (let i in a){
+		    animation.graphLine(i / 5, parseFloat(a[i]) * 20);
+		}
+	})
+}
 
-let getMyData = function () {
+new Slider("hardset_kinetic_energy", "get_kinetic_energy", "Кинетическая энергия");
+new Slider("set_speed", "get_speed", "Скорость", 20);
+new Slider("set_base_length", "get_base_length", "Длина", 0.9);
+new Slider("set_gravity", "get_gravity", "Ускорение свободного падения", 2000);
+
+/*let getMyData = function () {
     let url = '/get_data';
     fetch(url)
     .then(function(response) {

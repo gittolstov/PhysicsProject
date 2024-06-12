@@ -4,6 +4,8 @@ class Vector:
             self.backlink = backlink
         self.x = x
         self.y = y
+        self.ref_x = x
+        self.ref_y = y
         self.force_applications = []#all vectors in this list will be added to current vector every tick AKA force
 
     def draw(self, animator):
@@ -53,7 +55,10 @@ class Vector:
         return (self.x ** 2 + self.y ** 2)**0.5
 
     def set_length(self, length):
-        a = projections(self.x, self.y, length)
+        if self.length() != 0 and length >= 0:
+            self.ref_x = self.x
+            self.ref_y = self.y
+        a = projections(self.ref_x, self.ref_y, length)
         self.x = a["x"]
         self.y = a["y"]
 

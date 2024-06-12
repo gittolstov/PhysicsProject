@@ -23,7 +23,9 @@ class Slider{
 		}
 	}
 
-	//TODO make sliders receive data
+	setter(){
+		document.getElementById("" + this.id).style.left = slidersReceived[this.set] * this.modifieR + 5;
+	}
 }
 
 

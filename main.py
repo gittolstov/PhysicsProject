@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, flash, url_for, session
 from flask_cors import CORS, cross_origin
 from pendulum import *
+from log_parser import *
 import threading
 import turtle
 
@@ -52,13 +53,19 @@ def pst():
 
 
 class Main:
-    def __init__(self, tickrate=150):
-        #self.turtle = turtle.Turtle()
-        #self.turtle.shape("circle")
+    def __init__(self, tickrate=100):
+        self.model_list = {
+            "Pendulum": Pendulum
+        }
         self.animator = Animator()
         self.vectors = []
         self.tickrate = tickrate
         self.paused = True
+        self.playingback = False
+        self.recording = {
+            "object": {},
+            "frame": 0
+        }
         self.to_draw = ""
         self.model = None
 
@@ -67,21 +74,29 @@ class Main:
             self.paused = not self.paused
         elif event == "only_pause":
             self.paused = True
+        elif event == "log_animation":
+            parser.save("testlog2", self.model.log)
+        elif event == "play_animation":
+            print("started")
+            self.load_playback("testlog2")
         elif event.startswith("slider"):
             parsed = event.split(" ")
             print(parsed)
             bar = getattr(self.model, parsed[1])
             bar(float(parsed[2]))
 
-    def set_timeout(self):
+    def set_timeout(self):#should be in every model
         self.timer = threading.Timer(1 / self.tickrate, self.tick_move, args=None, kwargs=None)
         self.timer.start()
 
     def tick_move(self):
         if not self.paused:
-            for i in self.vectors:
-                i.tick_move()
-                #i.draw(self.turtle)
+            if self.playingback:
+                self.playback_frame()
+            else:
+                for i in self.vectors:
+                    i.tick_move()
+                    #i.draw(self.turtle)
         self.to_draw = self.model.draw(self.animator)
         self.set_timeout()
 
@@ -94,11 +109,30 @@ class Main:
         self.vectors.extend(model.get_working_vectors())
         self.model = model
 
+    def add_model_byname(self, model_name):
+        a = self.model_list[model_name]()
+        self.vectors.extend(a.get_working_vectors())
+        self.model = a
+
+    def start_playback(self, dct):
+        self.playingback = True
+        self.recording["object"] = dct
+        self.recording["frame"] = 0
+
+    def playback_frame(self):
+        self.recording["frame"] += 1
+        print(self.recording["frame"])
+        self.model.apply_log(self.recording["object"], self.recording["frame"])
+
+    def load_playback(self, name):
+        self.start_playback(parser.fetch(name))
+
 
 class Animator:
     def __init__(self):
         """circle = 0"""
         """line = 1"""
+        """vector = 2"""
         pass
 
     def circle(self, x, y, radius, width, color):
@@ -107,10 +141,14 @@ class Animator:
     def line(self, x1, y1, x2, y2, width, color):
         return f"1 {x1} {y1} {x2} {y2} {width} {color};"
 
+    def vector(self, x1, y1, x2, y2, width, color):
+        return f"2 {x1} {y1} {x2} {y2} {width} {color};"
+
 
 if __name__ == "__main__":
     PENDULUM = Pendulum()
     main = Main()
+    parser = Log_parser()
     main.add_model(PENDULUM)
     main.set_timeout()
     print(PENDULUM.get_potential_energy())

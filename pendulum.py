@@ -21,7 +21,8 @@ class Pendulum(Vector):#representation of pendulum in memory
                 'x': [],
                 'y': []
             },
-            "full_energy": []
+            "full_energy": [],
+            "simulation_type": "Pendulum"
         }
         super().__init__(0, y)
         self.base_values = [x, y, gravity]
@@ -41,16 +42,31 @@ class Pendulum(Vector):#representation of pendulum in memory
         self.log["tension"]["y"].append(self.tension.y)
         self.log["full_energy"].append(self.full_energy)
 
+    def apply_log(self, log, frame):#should be in every model, applies frames from log
+        print(log)
+        if frame > len(log["self"]["x"]):
+            print("frame index out of range")
+            return
+        self.x = log["self"]["x"][frame]
+        self.y = log["self"]["y"][frame]
+        self.speed.x = log["speed"]["x"][frame]
+        self.speed.y = log["speed"]["y"][frame]
+        self.gravity.x = log["gravity"]["x"][frame]
+        self.gravity.y = log["gravity"]["y"][frame]
+        self.tension.x = log["tension"]["x"][frame]
+        self.tension.y = log["tension"]["y"][frame]
+        self.full_energy = log["full_energy"][frame]
+
     def draw(self, animator):#should be in every model
         self.store_sliders()
         #print(self.x + self.starting_point_x, self.y + self.starting_point_y)
         #animator.goto(self.x + self.starting_point_x, self.y + self.starting_point_y)
         draw_string = ""
-        draw_string += animator.circle(self.starting_point_x + self.x, self.starting_point_y + self.y, 40, "6", "red")
+        draw_string += animator.circle(self.starting_point_x + self.x, self.starting_point_y + self.y, 20, "40", "GoldenRod")
         draw_string += animator.line(self.starting_point_x, self.starting_point_y, self.starting_point_x + self.x, self.starting_point_y + self.y, "3", "black")
-        draw_string += animator.line(self.starting_point_x + self.x, self.starting_point_y + self.y, self.starting_point_x + self.x + self.speed.x * 10, self.starting_point_y + self.y + self.speed.y * 10, "4", "green")
-        draw_string += animator.line(self.starting_point_x + self.x, self.starting_point_y + self.y, self.starting_point_x + self.x + self.tension.x * 200, self.starting_point_y + self.y + self.tension.y * 200, "3", "red")
-        draw_string += animator.line(self.starting_point_x + self.x, self.starting_point_y + self.y, self.starting_point_x + self.x + self.gravity.x * 200, self.starting_point_y + self.y + self.gravity.y * 200, "3", "red")
+        draw_string += animator.vector(self.starting_point_x + self.x, self.starting_point_y + self.y, self.starting_point_x + self.x + self.speed.x * 20, self.starting_point_y + self.y + self.speed.y * 20, "4", "green")
+        draw_string += animator.vector(self.starting_point_x + self.x, self.starting_point_y + self.y, self.starting_point_x + self.x + self.tension.x * 400, self.starting_point_y + self.y + self.tension.y * 400, "3", "red")
+        draw_string += animator.vector(self.starting_point_x + self.x, self.starting_point_y + self.y, self.starting_point_x + self.x + self.gravity.x * 400, self.starting_point_y + self.y + self.gravity.y * 400, "3", "blue")
         return draw_string
 
     def reset(self):#should be in every model
@@ -149,8 +165,9 @@ class Tension(Vector):
 
     def tick2(self):
         a = projections(self.x, self.y, self.backlink.gravity.length())
-        self.set_length(-a["y"])
+        self.set_length(-a["y"] + self.backlink.speed.length() ** 2 / self.backlink.baseLength)
         self.turn_to(-self.backlink.x, -self.backlink.y)
+
 
 
 if __name__ == "__main__":

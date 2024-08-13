@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, redirect, flash, url_for, session
 from flask_cors import CORS, cross_origin
 from pendulum import *
+from cosmic_velocity import Cosmic_velocity
+from electromagnetic_oscillations import Oscillations
 from log_parser import *
 import threading
 import turtle
@@ -23,7 +25,7 @@ def ret1():
 
 @app.route("/get_sliders")
 def ret2():
-    return main.model.sliders
+    return str(main.model.time) + ";" + main.model.sliders
 
 
 @app.route("/get_kinetic")
@@ -36,13 +38,34 @@ def ret4():
     return str(main.model.full_energy)
 
 
-@app.route("/speed_graph")
-def ret5():
-    a = ""
-    sh = main.model.log["speed"]
-    for i in range(main.model.time):
-        a += str((sh["x"][i]**2 + sh["y"][i]**2)**0.5 * sh["x"][i] / abs(sh["x"][i])) + " "
-    return a
+@app.route("/graph/<number>")
+def ret5(number):
+    data = []
+    for i in number:
+        data.append(" ".join(main.model.get_graph(i)))
+    return ";".join(data)
+
+
+@app.route("/request_sliders")
+def ret6():
+    text = ""
+    for i in range(len(main.model.setters_and_getters["setters"])):
+        text += main.model.setters_and_getters["setters"][i] + "/"
+        text += main.model.setters_and_getters["getters"][i] + "/"
+        text += main.model.setters_and_getters["names"][i] + "/"
+        text += main.model.setters_and_getters["modifiers"][i] + "/"
+        text += main.model.setters_and_getters["shifts"][i] + ";"
+    return text[:-1]
+
+
+@app.route("/playback_names")
+def ret7():
+    return "\n" + "\n".join(parser.readfile()[0])
+
+
+@app.route("/energy")
+def ret8():
+    return str(main.model.get_kinetic()) + str(main.model.get_potential())
 
 
 @app.route('/event', methods=["POST"])
@@ -54,8 +77,11 @@ def pst():
 
 class Main:
     def __init__(self, tickrate=100):
+        print("MAIN PROCESS IS RUNNING")
         self.model_list = {
-            "Pendulum": Pendulum
+            "Pendulum": PENDULUM,
+            "Cosmic_velocity": COSMIC,
+            "Oscillations": ELECTRO
         }
         self.animator = Animator()
         self.vectors = []
@@ -67,25 +93,50 @@ class Main:
             "frame": 0
         }
         self.to_draw = ""
+        self.animatimer = 0
         self.model = None
 
     def handle_event(self, event):
         if event == "pause":
-            self.paused = not self.paused
+            self.pause()
         elif event == "only_pause":
             self.paused = True
-        elif event == "log_animation":
-            parser.save("testlog2", self.model.log)
-        elif event == "play_animation":
-            print("started")
-            self.load_playback("testlog2")
+        elif event == "model_pendulum":
+            self.end_playback()
+            self.reset_model(PENDULUM)
+        elif event == "model_cosmic":
+            self.end_playback()
+            self.reset_model(COSMIC)
+        elif event == "model_electro":
+            self.end_playback()
+            self.reset_model(ELECTRO)
+        elif event == "reset":
+            self.end_playback()
+            self.model.reset()
+            self.vectors = self.model.get_working_vectors()
+        elif event == "playforth":
+            self.end_playback()
         elif event.startswith("slider"):
             parsed = event.split(" ")
-            print(parsed)
             bar = getattr(self.model, parsed[1])
             bar(float(parsed[2]))
+        elif event.startswith("recording"):
+            parsed = event.split(" ")
+            self.load_playback(parsed[1])
+        elif event.startswith("rewind"):
+            parsed = event.split(" ")
+            self.rewind(int(parsed[1]))
+        elif event.startswith("save_record"):
+            parsed = event.split(" ")
+            parser.save(parsed[1], self.model.log)
+            self.end_playback()
+            self.model.reset()
+            self.vectors = self.model.get_working_vectors()
 
-    def set_timeout(self):#should be in every model
+    def pause(self):
+            self.paused = not self.paused
+
+    def set_timeout(self):
         self.timer = threading.Timer(1 / self.tickrate, self.tick_move, args=None, kwargs=None)
         self.timer.start()
 
@@ -97,7 +148,9 @@ class Main:
                 for i in self.vectors:
                     i.tick_move()
                     #i.draw(self.turtle)
-        self.to_draw = self.model.draw(self.animator)
+        self.to_draw = self.model.draw(self.animator) + self.animator.pause(int(self.paused))
+        self.to_draw += self.animator.playing_back(30, 30, 5, "10", "red", 1 * self.animatimer % 80 >= 40, self.playingback)
+        self.animatimer += 1
         self.set_timeout()
 
     # def run(self):
@@ -105,19 +158,46 @@ class Main:
     #         print("my thread")
     #         # call a function
 
+    def rewind(self, frame):
+        ln = 0
+        for i in self.model.log["self"]:
+            ln = len(self.model.log["self"][i])
+            break
+        if self.playingback:
+            length = 0
+            for i in self.recording["object"]["self"]:
+                length = len(self.recording["object"]["self"][i])
+            if frame < length:
+                self.model.apply_log(self.recording["object"], frame)
+                self.recording['frame'] = frame
+        elif frame < ln:
+            self.model.time = frame
+            self.model.apply_log(self.model.log, frame)
+
+    def reset_model(self, model):
+        model.reset()
+        self.add_model(model)
+
     def add_model(self, model):
-        self.vectors.extend(model.get_working_vectors())
+        self.vectors = model.get_working_vectors()
         self.model = model
+        self.model.main = self
 
     def add_model_byname(self, model_name):
-        a = self.model_list[model_name]()
-        self.vectors.extend(a.get_working_vectors())
+        a = self.model_list[model_name]
+        self.vectors = a.get_working_vectors()
         self.model = a
+        self.model.main = self
 
     def start_playback(self, dct):
         self.playingback = True
+        self.add_model_byname(dct["simulation_type"])
         self.recording["object"] = dct
         self.recording["frame"] = 0
+        add_to_log(self.model.log, dct)
+
+    def end_playback(self):
+        self.playingback = False
 
     def playback_frame(self):
         self.recording["frame"] += 1
@@ -133,6 +213,12 @@ class Animator:
         """circle = 0"""
         """line = 1"""
         """vector = 2"""
+        """scheme = 3"""
+        """pause = 4"""
+        """playback = 5"""
+        """planet = 6"""
+        """ship = 7"""
+        """pendulum = 8"""
         pass
 
     def circle(self, x, y, radius, width, color):
@@ -144,14 +230,31 @@ class Animator:
     def vector(self, x1, y1, x2, y2, width, color):
         return f"2 {x1} {y1} {x2} {y2} {width} {color};"
 
+    def scheme(self):
+        return "3;"
+
+    def pause(self, paused):
+        return f"4 {paused};"
+
+    def playing_back(self, x, y, radius, width, color, on, playback):
+        return f"0 {x} {y} {radius} {width} {color};" * (on and playback) + f"5 " + "1" * playback + "0" * (not playback) + ";"
+
+    def planet(self, x, y, radius):
+        return f"6 {x} {y} {radius};"
+
+    def ship(self, x, y, x2, y2):
+        return f"7 {x} {y} {x2} {y2};"
+
+    def pendulum(self, x, y, rad):
+        return f"8 {x} {y} {rad};"
+
 
 if __name__ == "__main__":
     PENDULUM = Pendulum()
+    COSMIC = Cosmic_velocity()
+    ELECTRO = Oscillations()
     main = Main()
     parser = Log_parser()
-    main.add_model(PENDULUM)
+    main.add_model(ELECTRO)
     main.set_timeout()
-    print(PENDULUM.get_potential_energy())
-    print(PENDULUM.get_kinetic_energy())
-    print(PENDULUM.full_energy)
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0', debug=False)

@@ -1,24 +1,73 @@
 <html lang="ru">
 	<head>
-		<title>Симуляция - маятник</title>
+		<title>Симуляция</title>
+    	<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+		<link rel="stylesheet" href="{{ url_for('static', filename='borrowed-button.css') }}">
 	</head>
 	<body>
-		<div style="display: flex; margin:4%">
-			<div style="margin: 3% 3%;">
-				<canvas style="border: 10px solid grey; width: 1000; height: 1000;" width=1000 height=1000 id="main"></canvas>
-			</div>
-			<div style="margin: 3% 3%;">
-				<div style="font-family: sans-serif; padding: 5px; border: 10px solid grey; width: 500; height: 500; display: block;" id="stats" onmouseup="keyUp();">
-					
+		<div class="wrapper">
+			<div class="sider"></div>
+			<div class="up-and-down">
+				<div class="upper-interface">
+						<!-- <button onclick="speedGraph()" class="button-82-pushable" role="button">
+							<span class="button-82-shadow"></span>
+							<span class="button-82-edge"></span>
+							<span class="button-82-front text">
+								<a>Нарисовать график скорости</a>
+							</span>  -->
+						<button class="button-82-pushable" role="button">
+							<span class="button-82-shadow"></span>
+							<span class="button-82-edge"></span>
+							<span class="button-82-front text">
+								<div class="dropdown">
+									<span>Выбрать симуляцию</span>
+									<div class="dropdown-content">
+										<p onclick="switchPendulum()">Маятник</p>
+										<p onclick="switchCosmic()">Космическая скорость</p>
+										<p onclick="switchElectro()">Электромагнитные колебания</p>
+									</div>
+								</div>
+							</span>
+						</button>
+						</button>
+						<button onclick="sendMyData('pause');" class="button-82-pushable" role="button">
+							<span class="button-82-shadow"></span>
+							<span class="button-82-edge"></span>
+							<span class="button-82-front text">
+								<a id="pause">▶</a>
+							</span>
+						</button>
+						<button onclick="tryResetting()" class="button-82-pushable" role="button">
+							<span class="button-82-shadow"></span>
+							<span class="button-82-edge"></span>
+							<span class="button-82-front text">
+								<a>Перезапустить симуляцию</a>
+							</span>
+						</button>
+						<button onclick="playRecording()" class="button-82-pushable" role="button">
+							<span class="button-82-shadow"></span>
+							<span class="button-82-edge"></span>
+							<span class="button-82-front text">
+								<a id="playback">Включить.. запись</a>
+							</span>
+						</button>
 				</div>
-				<div>
-					<canvas style="padding: 15px; width: 500px; height: 500px;" width=500 height=500 id="graph"></canvas>
+				<div class="content-wrapper">
+					<div class="lesser-wrapper">
+						<canvas class="canvas" width=1000 height=1000 id="main"></canvas>
+					</div>
+					<div class="lesser-wrapper">
+						<canvas id="sliderCanvas" class="sliders-box" width=500 height=500 id="stats" onmousedown="keyDown();" onmousemove="mouseMoveHandler();" onmouseup="keyUp();">
+						</canvas>
+						<div>
+							<canvas class="graph-canvas" width=500 height=500 id="graph" onmousedown="keyDown(1);" onmousemove="mouseMoveHandler(1);" onmouseup="keyUp(1);"></canvas>
+						</div>
+					</div>
+					<div class="lesser-wrapper2" id="checkboxes">
+					</div>
 				</div>
 			</div>
-			<div style="margin: 3% 3%;">
-				<p style="text-align: center"><button onclick="speedGraph()">Нарисовать график скорости</button></p>
-				<p style="text-align: center"><button onclick="sendMyData('pause');" id="butn">Пауза</button></p>
-			</div>
+			<div class="sider"></div>
 		</div>
 		<script src='{{url_for("static", filename="animation2.js")}}'></script>
 		<script src='{{url_for("static", filename="sliders.js")}}'></script>

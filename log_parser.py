@@ -23,7 +23,7 @@ class Log_parser:#saves dictionaries into the file and reads them
         pointers_texts = self.readfile()
         a = 0
         try:
-            a = pointers_texts[0].index(name) - 1
+            a = pointers_texts[0].index(name)
         except:
             print("no such index")
             print("pointers")
@@ -78,8 +78,19 @@ class Log_parser:#saves dictionaries into the file and reads them
         with open(self.filepath, "w", encoding="utf-8") as file:
             file.write(" ".join(pointers_texts[0]) + "¶" + "	".join(pointers_texts[1]))##conv
 
-    def parse(self, text):#
-        dict = {}
+
+def add_to_log(log, appendage):
+    for a in log:
+        if log[a] is dict:
+            for b in log[a]:
+                log[a][b] = appendage[a][b]
+
+
+def cut_log(log, index):
+    for a in log:
+        if isinstance(log[a], dict):
+            for b in log[a]:
+                log[a][b] = log[a][b][:index]
 
 
 if __name__ == "__main__":

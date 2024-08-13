@@ -40,6 +40,9 @@ class Vector:
         another_vector.x = self.x
         another_vector.y = self.y
 
+    def reset_forces(self):
+        self.force_applications = []
+
     def mark_forces(self, other):
         self.force_applications.append(other)
 
@@ -76,6 +79,13 @@ class Vector:
         aux = self.x
         self.x = self.y * direction
         self.y = -aux * direction
+
+
+def cut_log(log, index):
+    for a in log:
+        if type(log[a]) == type({}):
+            for b in log[a]:
+                log[a][b] = log[a][b][:index]
 
 
 def projections(a, b, hypothesis):

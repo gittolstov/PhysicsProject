@@ -6,6 +6,7 @@ class Animation{
 		this.gx = 0;
 		this.gy = 250;
 		this.masterBackgroundStyle = "lightgrey";
+		this.chimage =
 	}
 
 	refresh(){

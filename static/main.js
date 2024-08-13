@@ -1,17 +1,23 @@
-let x = document.getElementById("stats");
-for (let a = 0; a < 9; a++){
-	x.innerHTML += '<div style="height: 50; margin-top: 5; background-color: darkgray;" onmousedown="keyDown(' + a + ');" onmousemove="mouseMoveHandler(' + a + ');"><button style="background-color: crimson; display: block; position: relative; left: 0; height: 25; width: 25;" id="' + a + '"></button><i id="' + a + 'b">adadadada</i></div>';
-}
-
 let animation = new Animation();
-//animation.drawGraph();
+counter = 0
 setInterval(() => {
 	animation.receiveData();
-	//animation.drawGraph1();
 	receiveSliders();
+	if (counter >= 20){
+	    counter = 0;
+	    graphRequest = ""
+    	for (let a in slidersList){
+    	    if (slidersList[a].isChecked){
+    	        graphRequest += a;
+    	    }
+	    }
+	    graph(graphRequest);
+	}
+	counter++;
 	for (let a in slidersList){
 		slidersList[a].setter();
 	}
+	timeSlider.setter();
 }, 50);
 
 function sendMyData(something){
@@ -30,7 +36,9 @@ function sendMyData(something){
 }
 
 let slidersList = [];
-let slidersReceived = {}
+let slidersReceived = {time: 0}
+let lookupColors = ["red", "orange", "yellow", "green", "blue", "magenta", "black", "brown", "pink"];
+timeSlider = new TimeSlider();
 
 function receiveSliders(){
 	let url = '/get_sliders';
@@ -40,6 +48,7 @@ function receiveSliders(){
 	})
 	.then(function(text) {
 		let a = text.split(";");
+		slidersReceived.time = a.shift();
 		for (let i in a){
 			let b = a[i].split(" ");
 			slidersReceived[b[0]] = parseFloat(b[1]);
@@ -47,25 +56,82 @@ function receiveSliders(){
 	})
 }
 
-function speedGraph(){
-	let url = '/speed_graph';
+function graph(num){//legacy
+    if (num == ""){
+        animation.drawGraph();
+        return;
+    }
+	let url = '/graph/' + num;
 	fetch(url)
 	.then(function(response) {
 		return response.text();
 	})
 	.then(function(text) {
-		let a = text.split(" ");
-		animation.drawGraph();
-		for (let i in a){
-		    animation.graphLine(i / 5, parseFloat(a[i]) * 20);
+		let parsed = text.split(";");
+        animation.drawGraph();
+	    timeSlider.draw();
+        for (let a in parsed){
+            animation.graphCanvas.strokeStyle = lookupColors[num[a]]
+            b = parsed[parseFloat(a)].split(" ")
+            for (let i in b){
+                animation.graphLine(i / 20, parseFloat(b[i]));
+            }
+            animation.gx = 0
+            animation.gy = 500
 		}
 	})
 }
 
-new Slider("hardset_kinetic_energy", "get_kinetic_energy", "Кинетическая энергия");
-new Slider("set_speed", "get_speed", "Скорость", 20);
-new Slider("set_base_length", "get_base_length", "Длина", 0.9);
-new Slider("set_gravity", "get_gravity", "Ускорение свободного падения", 2000);
+function playRecording(){
+    if (animation.playbackButton.innerHTML === "Выключить запись"){
+		sendMyData("playforth")
+        return
+    }
+	let url = '/playback_names';
+	fetch(url)
+	.then(function(response) {
+		return response.text();
+	})
+	.then(function(text) {
+		let prmt = prompt("Выберите запись из списка сохранённых:" + text)
+		if (prmt === null){
+			return
+		}
+		sendMyData("recording " + prmt)
+        setTimeout(requestSliders, 500)
+	})
+}
+
+function switchPendulum(){
+    sendMyData("model_pendulum")
+    sendMyData("only_pause")
+    setTimeout(requestSliders, 500)
+}
+
+function switchCosmic(){
+    sendMyData("model_cosmic")
+    sendMyData("only_pause")
+    setTimeout(requestSliders, 500)
+}
+
+function switchElectro(){
+    sendMyData("model_electro")
+    sendMyData("only_pause")
+    setTimeout(requestSliders, 500)
+}
+
+function tryResetting(){
+    a = prompt("Введите название записи для сохранения (без пробелов латиницей)")
+    if (a !== null){
+        sendMyData("save_record " + a)
+        requestSliders();
+    } else {
+        sendMyData('reset');
+        setTimeout(requestSliders, 500)
+    }
+}
+
+requestSliders();
 
 /*let getMyData = function () {
     let url = '/get_data';

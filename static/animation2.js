@@ -9,7 +9,7 @@ class Animation{
 		this.gx = 0;
 		this.gy = 250;
 		this.masterBackgroundStyle = "white";
-		this.drawingFunctions = ["circle", "line", "vector", "scheme", "pause", "playingBack", "planet", "ship", "pendulum"];
+		this.drawingFunctions = ["circle", "line", "vector", "scheme", "pause", "playingBack", "planet", "ship", "pendulum", "shipBoom"];
 		this.schimage = new Image;
 	    this.schimage.src = "/static/Scheme.png";
 		this.earth = new Image;
@@ -18,6 +18,8 @@ class Animation{
 	    this.spaceship.src = "/static/Spaceship.png";
 		this.goldenball = new Image;
 	    this.goldenball.src = "/static/Pendulum.png";
+		this.expl = GIF();
+	    this.expl.load("/static/SpaceshipExplosion.gif");
 	}
 
 	pause(isPaused){
@@ -84,6 +86,10 @@ class Animation{
 
 	pendulum(args){
 	    this.masterCanvas.drawImage(this.goldenball, args[1] - args[3] * 2, args[2] - args[3] * 2, args[3] * 4, args[3] * 4);
+	}
+
+	shipBoom(args){
+	    this.masterCanvas.drawImage(this.expl, args[1] - args[3], args[2] - args[3], args[3], args[3]);
 	}
 
 	refresh(){

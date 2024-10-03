@@ -219,6 +219,7 @@ class Animator:
         """planet = 6"""
         """ship = 7"""
         """pendulum = 8"""
+        """explosion = 9"""
         pass
 
     def circle(self, x, y, radius, width, color):
@@ -247,6 +248,9 @@ class Animator:
 
     def pendulum(self, x, y, rad):
         return f"8 {x} {y} {rad};"
+
+    def ship_boom(self, x, y, x2, y2):
+        return f"9 {x} {y} {x2} {y2};"
 
 
 if __name__ == "__main__":

@@ -9,6 +9,7 @@
   user-select: none;
   -webkit-user-select: none;
   touch-action: manipulation;
+  height: 51;
 }
 
 .button-82-shadow {

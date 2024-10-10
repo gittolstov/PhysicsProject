@@ -18,8 +18,10 @@ class Animation{
 	    this.spaceship.src = "/static/Spaceship.png";
 		this.goldenball = new Image;
 	    this.goldenball.src = "/static/Pendulum.png";
-		this.expl = GIF();
-	    this.expl.load("/static/SpaceshipExplosion.gif");
+		this.expl = [new Image, new Image, new Image, new Image, new Image, new Image];
+	    for (let a in this.expl){
+	        this.expl[a].src = "/static/explosion_frames/frame" + a + ".png";
+	    }
 	}
 
 	pause(isPaused){
@@ -89,7 +91,7 @@ class Animation{
 	}
 
 	shipBoom(args){
-	    this.masterCanvas.drawImage(this.expl, args[1] - args[3], args[2] - args[3], args[3], args[3]);
+	    this.masterCanvas.drawImage(this.expl[args[5]], args[1], args[2], args[3], args[4]);
 	}
 
 	refresh(){

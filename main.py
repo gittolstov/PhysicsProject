@@ -249,8 +249,8 @@ class Animator:
     def pendulum(self, x, y, rad):
         return f"8 {x} {y} {rad};"
 
-    def ship_boom(self, x, y, x2, y2):
-        return f"9 {x} {y} {x2} {y2};"
+    def ship_boom(self, x, y, x2, y2, frame):
+        return f"9 {x} {y} {x2} {y2} {frame};"
 
 
 if __name__ == "__main__":

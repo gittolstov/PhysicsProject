@@ -3,12 +3,13 @@
 	justify-content: space-between;
 	height: 100%;
 	margin-right: 0;
-	margin-left: 0
+	margin-left: 0;
 }
 
 .content-wrapper {
 	display: flex;
-	justify-content: space-evenly
+	justify-content: space-evenly;
+	height: 89.216656016%;
 }
 
 .lesser-wrapper {
@@ -28,8 +29,8 @@
 
 .box-wrapper {
 	display: flex;
-	height: 50px;
-	padding: 5px
+	height: 4.96195831955%;
+	padding: 4.89332550401%;
 }
 
 .sider {
@@ -39,29 +40,32 @@
 
 .up-and-down {
 	display: block;
-	width: 80%
+	width: 80%;
+	height: 100%;
 }
 
 .upper-interface {
 	display: flex;
 	justify-content: space-around;
-	padding: 40px
+	padding: 1.70927648768%;
+	height: 4.64620306192%;
 }
 
 .canvas {
-	width: 1000;
-	height: 1000;
+	width: 100%;
+	height: 97.2732366308%;
 }
 
 .sliders-box {
 	font-family: sans-serif;
-	width: 500; height: 500;
+	width: 100%;
+	height: 48.6366183154%;
 	display: block
 }
 
 .graph-canvas {
-	width: 500px;
-	height: 500px
+	width: 100%;
+	height: 48.6366183154%;
 }
 
 .dropdown {
@@ -74,9 +78,9 @@
     position: absolute;
     background-color: #f9f9f9;
     color: black;
-    min-width: 160px;
+    min-width: 7.8648233486943164362519201228879%;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    padding: 12px 16px;
+    padding: 0.58986175115207373271889400921659% 0.78648233486943164362519201228879%;
     z-index: 1;
 }
 
@@ -85,11 +89,11 @@
 }
 
 body {
-	margin: 0
+	margin: 0;
 }
 
 p {
-	text-align: center
+	text-align: center;
 }
 
 input {
@@ -97,5 +101,5 @@ input {
 }
 
 a {
-    width: 50px
+    width: 2.4577572964669738863287250384025%;
 }

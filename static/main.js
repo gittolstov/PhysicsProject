@@ -74,7 +74,7 @@ function graph(num){//legacy
             animation.graphCanvas.strokeStyle = lookupColors[num[a]]
             b = parsed[parseFloat(a)].split(" ")
             for (let i in b){
-                animation.graphLine(i / 20, parseFloat(b[i]));
+				animation.graphLine(i / 20, parseFloat(b[i]));
             }
             animation.gx = 0
             animation.gy = 500
@@ -121,14 +121,18 @@ function switchElectro(){
 }
 
 function tryResetting(){
-    a = prompt("Введите название записи для сохранения (без пробелов латиницей)")
-    if (a !== null){
-        sendMyData("save_record " + a)
-        requestSliders();
+	a = prompt("Введите название записи для сохранения (без пробелов латиницей)")
+	if (a !== null){
+		sendMyData("save_record " + a)
+		requestSliders();
     } else {
-        sendMyData('reset');
-        setTimeout(requestSliders, 500)
-    }
+		sendMyData('reset');
+		setTimeout(requestSliders, 500)
+	}
+}
+
+function reset(){
+	sendMyData('reset');
 }
 
 requestSliders();

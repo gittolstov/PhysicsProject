@@ -26,9 +26,11 @@ class Animation{
 
 	pause(isPaused){
 	    if (parseInt(isPaused[1])){
-			this.pauseButton.innerHTML = "⏵︎";
+			//this.pauseButton.innerHTML = "⏵︎";
+			this.pauseButton.src = "/static/Play.svg";
 		} else {
-			this.pauseButton.innerHTML = "⏸︎";
+			//this.pauseButton.innerHTML = "⏸︎";
+			this.pauseButton.src = "/static/Pause.svg";
 		}
 	}
 
@@ -57,15 +59,15 @@ class Animation{
 		this.masterCanvas.stroke();
 	}
 
-	vector(args){
+	vector(args){//x1 y1 x2 y2
 	    let magicArrowLength = 10;
 	    let a = projections(args[1]-args[3], args[2]-args[4], magicArrowLength);
 		this.masterCanvas.beginPath();
 		this.masterCanvas.moveTo(args[1], args[2]);
 		this.masterCanvas.lineTo(args[3], args[4]);
-		this.masterCanvas.moveTo(parseFloat(args[3]) + a.x + a.y, parseFloat(args[4]) + a.y - a.x);
+		this.masterCanvas.moveTo(parseFloat(args[3]) + 2 * a.x + a.y, parseFloat(args[4]) + 2 * a.y - a.x);
 		this.masterCanvas.lineTo(parseFloat(args[3]), parseFloat(args[4]));
-		this.masterCanvas.moveTo(parseFloat(args[3]) + a.x - a.y, parseFloat(args[4]) + a.y + a.x);
+		this.masterCanvas.moveTo(parseFloat(args[3]) + 2 * a.x - a.y, parseFloat(args[4]) + 2 * a.y + a.x);
 		this.masterCanvas.lineTo(parseFloat(args[3]), parseFloat(args[4]));
 		this.masterCanvas.strokeStyle = args[6];
 		this.masterCanvas.lineWidth = parseInt(args[5]);

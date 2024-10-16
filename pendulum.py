@@ -3,7 +3,7 @@ from log_parser import cut_log
 
 
 class Pendulum(Vector):#representation of pendulum in memory
-    def __init__(self, x=500, y=500, gravity=0.1):
+    def __init__(self, x=500, y=750, gravity=0.1):
         super().__init__(0, y)
         self.base_values = [x, y, gravity]
         self.starting_point_x = x
@@ -33,7 +33,7 @@ class Pendulum(Vector):#representation of pendulum in memory
             "modifiers": [
                 "10",
                 "20",
-                "0.9",
+                "0.5",
                 "2000"
             ],
             "shifts": [
@@ -136,9 +136,9 @@ class Pendulum(Vector):#representation of pendulum in memory
         draw_string = ""
         draw_string += animator.pendulum(self.starting_point_x + self.x, self.starting_point_y + self.y, 40)
         draw_string += animator.line(self.starting_point_x, self.starting_point_y, self.starting_point_x + self.x, self.starting_point_y + self.y, "3", "black")
-        draw_string += animator.vector(self.starting_point_x + self.x, self.starting_point_y + self.y, self.starting_point_x + self.x + self.speed.x * 20, self.starting_point_y + self.y + self.speed.y * 20, "4", "green")
-        draw_string += animator.vector(self.starting_point_x + self.x, self.starting_point_y + self.y, self.starting_point_x + self.x + self.tension.x * 400, self.starting_point_y + self.y + self.tension.y * 400, "3", "red")
-        draw_string += animator.vector(self.starting_point_x + self.x, self.starting_point_y + self.y, self.starting_point_x + self.x + self.gravity.x * 400, self.starting_point_y + self.y + self.gravity.y * 400, "3", "blue")
+        draw_string += animator.vector(self.starting_point_x + self.x, self.starting_point_y + self.y, self.starting_point_x + self.x + self.speed.x * 30, self.starting_point_y + self.y + self.speed.y * 30, "6", "green")
+        draw_string += animator.vector(self.starting_point_x + self.x, self.starting_point_y + self.y, self.starting_point_x + self.x + self.tension.x * 1000, self.starting_point_y + self.y + self.tension.y * 1000, "4", "red")
+        draw_string += animator.vector(self.starting_point_x + self.x, self.starting_point_y + self.y, self.starting_point_x + self.x + self.gravity.x * 1000, self.starting_point_y + self.y + self.gravity.y * 1000, "4", "blue")
         return draw_string
 
     def get_working_vectors(self):#should be in every model

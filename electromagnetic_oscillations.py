@@ -123,12 +123,22 @@ class Oscillations:
         draw_string = ""
         draw_string += animator.scheme()
         img = self.image_size
-        shift = self.capacitance / 20
+        shift = 2000 / self.capacitance
         draw_string += animator.line(img["x"], img["y"], img["x"], img["y"] + img['y_size'] / 2 - shift - 5, 4, "black")
         draw_string += animator.line(img["x"] - 45, img["y"] + img['y_size'] / 2 - shift - 5, img["x"] + 45, img["y"] + img['y_size'] / 2 - shift - 5, 4, "black")
         draw_string += animator.line(img["x"] - 45, img["y"] + img['y_size'] / 2 + shift + 5, img["x"] + 45, img["y"] + img['y_size'] / 2 + shift + 5, 4, "black")
         draw_string += animator.line(img["x"], img["y"] + img["y_size"], img["x"], img["y"] + img['y_size'] / 2 + shift + 5, 4, "black")
         draw_string += animator.line(img["x"] - 45, img['y'] + img['y_size'] / 2, img["x"] - 45, img['y'] + img['y_size'] / 2 + img["y_size"] * 0.4 * self.get_charge() / self.base_values[2], 20, "lightblue")
+        draw_string += animator.vector(img["x"] + img["x_size"],
+                                       img["y"] + img["y_size"] * (0.25 + 0.5 * (-self.current >= 0)),
+                                       img["x"] + img["x_size"],
+                                       img["y"] + img['y_size'] * (0.25 + 0.5 * (-self.current >= 0)) + -self.current * 40, 4,
+                                       "blue")
+        draw_string += animator.vector(img["x"] + img["x_size"],
+                                       img["y"] + img["y_size"] * 0.5,
+                                       img["x"] + img["x_size"],
+                                       img["y"] + img['y_size'] * 0.5 + -self.current * 40, 4,
+                                       "blue")
         for i in self.charges:
             draw_string += i.draw(animator)
         return draw_string
@@ -228,7 +238,7 @@ class Charge:
         return (x, y)
 
     def tick_move(self):
-        self.potential += self.backlink.current * 5
+        self.potential += self.backlink.current
         if self.potential >= self.backlink.wireLength:
             self.potential -= self.backlink.wireLength
         elif self.potential < 0:

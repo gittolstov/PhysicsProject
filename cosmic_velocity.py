@@ -44,8 +44,8 @@ class Cosmic_velocity(Vector):
             ],
             "modifiers": [
                 "0.01",
-                "5",
-                "20",
+                "1",
+                "40",
                 "1",
                 "10",
                 "10",
@@ -72,9 +72,15 @@ class Cosmic_velocity(Vector):
             "apogee": {
                 'x': [],
                 'y': [],
+                'going_up': [],
+                'previous_height': [],
                 'isDefined': []
             },
             "speed": {
+                'x': [],
+                'y': []
+            },
+            "gravity": {
                 'x': [],
                 'y': []
             },
@@ -91,8 +97,8 @@ class Cosmic_velocity(Vector):
         self.gMm = self.base_values[2]
         self.x = x
         self.y = y
-        self.gravity = Gravity(0, 1, self)
-        self.speed = Vector(2, 0, self)
+        self.gravity = Gravity(0, 0.0001, self)
+        self.speed = Vector(2.5, 0, self)
         self.apogee = Vector(0, 0, self)
         self.apogeic_speed = Vector(0, 0)
         self.apogee.going_up = False
@@ -100,10 +106,12 @@ class Cosmic_velocity(Vector):
         self.apogee.isDefined = False
         self.speed.mark_forces(self.gravity)
         self.mark_forces(self.speed)
-        self.planet_size = 20
+        self.planet_size = 100
         self.full_energy = 0
         self.sliders = ""
         self.count = 0
+        self.explosion_frame = 0
+        self.orbit_marks = []
 
     def get_graph(self, data):#should be in every model, returns graph arrays for each slider
         parsed = data.split(" ")
@@ -155,10 +163,14 @@ class Cosmic_velocity(Vector):
         self.log["self"]["length"].append(self.length())
         self.log["apogee"]["x"].append(self.apogee.x)
         self.log["apogee"]["y"].append(self.apogee.y)
-        self.log["apogee"]["isDefined"].append(self.apogee.isDefined * 1)
+        self.log["apogee"]["previous_height"].append(self.apogee.previous_height)
+        self.log["apogee"]["going_up"].append(int(self.apogee.going_up))
+        self.log["apogee"]["isDefined"].append(int(self.apogee.isDefined))
         self.apogee.previous_height = self.length()
         self.log["speed"]["x"].append(self.speed.x)
         self.log["speed"]["y"].append(self.speed.y)
+        self.log["gravity"]["x"].append(self.gravity.x)
+        self.log["gravity"]["y"].append(self.gravity.x)
         self.log["gMm"].append(self.gMm)
         self.log["size"].append(self.planet_size)
         self.log["full_energy"].append(self.full_energy)
@@ -172,6 +184,8 @@ class Cosmic_velocity(Vector):
         self.y = log["self"]["y"][frame]
         self.apogee.y = log["apogee"]["y"][frame]
         self.apogee.x = log["apogee"]["x"][frame]
+        self.apogee.going_up = bool(log["apogee"]["going_up"][frame])
+        self.apogee.previous_height = log["apogee"]["previous_height"][frame]
         self.apogee.isDefined = bool(log["apogee"]["isDefined"][frame])
         self.speed.x = log["speed"]["x"][frame]
         self.speed.y = log["speed"]["y"][frame]
@@ -186,8 +200,10 @@ class Cosmic_velocity(Vector):
         draw_string = ""
         draw_string += animator.planet(self.starting_point_x, self.starting_point_y, self.planet_size)
         draw_string += animator.ship(self.starting_point_x + self.x, self.starting_point_y + self.y, self.speed.x, self.speed.y)
-        draw_string += animator.vector(self.starting_point_x + self.x, self.starting_point_y + self.y, self.starting_point_x + self.x + self.speed.x * 20, self.starting_point_y + self.y + self.speed.y * 20, "4", "green")
-        draw_string += animator.vector(self.starting_point_x + self.x, self.starting_point_y + self.y, self.starting_point_x + self.x + self.gravity.x * 400, self.starting_point_y + self.y + self.gravity.y * 400, "3", "grey")
+        draw_string += animator.vector(self.starting_point_x + self.x, self.starting_point_y + self.y, self.starting_point_x + self.x + self.speed.x * 50, self.starting_point_y + self.y + self.speed.y * 50, "5", "green")
+        draw_string += animator.vector(self.starting_point_x + self.x, self.starting_point_y + self.y, self.starting_point_x + self.x + self.gravity.x * 3000, self.starting_point_y + self.y + self.gravity.y * 3000, "5", "grey")
+        for i in self.orbit_marks:
+            draw_string += animator.line(self.starting_point_x + i[0], self.starting_point_y + i[1], self.starting_point_x + i[0] + 1, self.starting_point_y + i[1] + 1, 1, "blue")
         if self.apogee.isDefined:
             temp = Vector(1, 1)
             self.apogee.transfer(temp)
@@ -201,6 +217,13 @@ class Cosmic_velocity(Vector):
                 2,
                 "red"
             )
+        #if self.apogee.going_up and self.apogee.previous_height > self.length() and self.apogee.isDefined:
+        #    self.orbit_marks = []
+        if self.length() < self.planet_size * 2 and self.explosion_frame < 80:
+            draw_string += animator.ship_boom(self.starting_point_x + self.x - 40, self.starting_point_y + self.y - 40, 80, 80, int(self.explosion_frame / 10))
+            self.explosion_frame += 1
+        if self.length() > self.planet_size * 2:
+            self.explosion_frame = 0
         return draw_string
 
     def get_working_vectors(self):#should be in every model
@@ -303,6 +326,7 @@ class Cosmic_velocity(Vector):
         self.log_state()
 
     def model_implications(self):
+        self.orbit_marks.append((self.x, self.y))
         if self.length() < self.planet_size * 2:
             self.main.pause()
         if self.apogee.isDefined:
@@ -317,6 +341,7 @@ class Cosmic_velocity(Vector):
         self.apogee.previous_height = a
 
     def snap_to_apogee(self):
+        self.orbit_marks = []
         print("snapped! " + str(self.apogee.x) + " " + str(self.apogee.y))
         self.apogee.transfer(self)
         self.apogeic_speed.transfer(self.speed)

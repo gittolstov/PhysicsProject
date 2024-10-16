@@ -34,9 +34,9 @@ class Slider{
 
 	draw(){
 		let x1 = 0;
-		let y1 = this.id * 60;
+		let y1 = this.id * 60 + 20;
 		let x2 = 500;
-		let y2 = 50;
+		let y2 = 30;
 		let x = this.offset
 		let zeroX = this.shift
 		let can = this.canvas;//background
@@ -63,13 +63,15 @@ class Slider{
 		can.fillStyle = "Bisque";
 		can.arc(x1 + x, y1 + y2 * 0.5, y2 * 0.15, 0, 2 * Math.PI, false);
 		can.fill()
-		can.fillStyle = "indigo";//zero marker
-		can.fillRect(zeroX, y1, 2, y2);
-		can.font = "20px Arial";
-		can.fillText(" 0", zeroX + 1, y1 + y2 * 0.95);
-		can.fillStyle = "White";//text
-		can.font = "18px Arial";
-		can.fillText(this.text, x1 + y2, y1 + y2 * 0.35);
+		can.fillStyle = "DarkMagenta";//zero marker
+		can.strokeStyle = 'indigo';
+		//can.fillRect(zeroX, y1, 2, y2);
+		can.font = "bold 30px Arial";
+		can.fillText("0", zeroX, y1 + y2 * 0.85);
+		can.strokeText("0", zeroX, y1 + y2 * 0.85);
+		can.fillStyle = "indigo";//text
+		can.font = "22px Arial";
+		can.fillText(this.text, Math.ceil(x1 + x2 / 4), Math.floor(y1 - y2 * 0.15));
 	}
 
 	switchGraph(bool){

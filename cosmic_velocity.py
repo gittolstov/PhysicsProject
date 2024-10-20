@@ -43,14 +43,14 @@ class Cosmic_velocity(Vector):
                 "Космическая скорость (по индексу)"
             ],
             "modifiers": [
-                "0.01",
+                "0.04",
                 "1",
                 "40",
                 "1",
                 "10",
                 "10",
                 "1000",
-                "150"
+                "225"
             ],
             "shifts": [
                 "0",
@@ -60,7 +60,7 @@ class Cosmic_velocity(Vector):
                 "0",
                 "400",
                 "0",
-                "0"
+                "25"
             ]
         }
         self.log = {
@@ -198,7 +198,7 @@ class Cosmic_velocity(Vector):
     def draw(self, animator):#should be in every model
         self.store_sliders()
         draw_string = ""
-        draw_string += animator.planet(self.starting_point_x, self.starting_point_y, self.planet_size)
+        draw_string += animator.planet(self.starting_point_x, self.starting_point_y, self.planet_size * 1.1)
         draw_string += animator.ship(self.starting_point_x + self.x, self.starting_point_y + self.y, self.speed.x, self.speed.y)
         draw_string += animator.vector(self.starting_point_x + self.x, self.starting_point_y + self.y, self.starting_point_x + self.x + self.speed.x * 50, self.starting_point_y + self.y + self.speed.y * 50, "5", "green")
         draw_string += animator.vector(self.starting_point_x + self.x, self.starting_point_y + self.y, self.starting_point_x + self.x + self.gravity.x * 3000, self.starting_point_y + self.y + self.gravity.y * 3000, "5", "grey")

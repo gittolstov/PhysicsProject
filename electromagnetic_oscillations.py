@@ -4,7 +4,7 @@ from log_parser import cut_log
 
 
 class Oscillations:
-    def __init__(self, capacitance=200, inductance=200, charge=400, charge_count=7, x1=250, y1=250, x2=500, y2=500):
+    def __init__(self, capacitance=200, inductance=200, charge=400, charge_count=15, x1=250, y1=250, x2=500, y2=500):
         self.wireLength = 1000
         self.image_size = {
             "x": x1,
@@ -128,17 +128,17 @@ class Oscillations:
         draw_string += animator.line(img["x"] - 45, img["y"] + img['y_size'] / 2 - shift - 5, img["x"] + 45, img["y"] + img['y_size'] / 2 - shift - 5, 4, "black")
         draw_string += animator.line(img["x"] - 45, img["y"] + img['y_size'] / 2 + shift + 5, img["x"] + 45, img["y"] + img['y_size'] / 2 + shift + 5, 4, "black")
         draw_string += animator.line(img["x"], img["y"] + img["y_size"], img["x"], img["y"] + img['y_size'] / 2 + shift + 5, 4, "black")
-        draw_string += animator.line(img["x"] - 45, img['y'] + img['y_size'] / 2, img["x"] - 45, img['y'] + img['y_size'] / 2 + img["y_size"] * 0.4 * self.get_charge() / self.base_values[2], 20, "lightblue")
+        draw_string += animator.line(img["x"] - 55, img['y'] + img['y_size'] / 2, img["x"] - 55, img['y'] + img['y_size'] / 2 + img["y_size"] * 0.4 * self.get_charge() / self.base_values[2], 20, "lightblue")
         draw_string += animator.vector(img["x"] + img["x_size"],
-                                       img["y"] + img["y_size"] * (0.25 + 0.5 * (-self.current >= 0)),
+                                       img["y"] + img["y_size"] * (0.25 + 0.52 * (self.current >= 0)),
                                        img["x"] + img["x_size"],
-                                       img["y"] + img['y_size'] * (0.25 + 0.5 * (-self.current >= 0)) + -self.current * 40, 4,
+                                       img["y"] + img['y_size'] * (0.25 + 0.52 * (self.current >= 0)) + -self.current * 40, 4,
                                        "blue")
-        draw_string += animator.vector(img["x"] + img["x_size"],
-                                       img["y"] + img["y_size"] * 0.5,
-                                       img["x"] + img["x_size"],
-                                       img["y"] + img['y_size'] * 0.5 + -self.current * 40, 4,
-                                       "blue")
+        # draw_string += animator.vector(img["x"] + img["x_size"],
+        #                                img["y"] + img["y_size"] * 0.5,
+        #                                img["x"] + img["x_size"],
+        #                                img["y"] + img['y_size'] * 0.5 + -self.current * 40, 4,
+        #                                "blue")
         for i in self.charges:
             draw_string += i.draw(animator)
         return draw_string

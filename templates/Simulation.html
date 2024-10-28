@@ -29,19 +29,26 @@
 								</div>
 							</span>
 						</button>
+						<button onclick="reset()" class="button-82-pushable" role="button">
+							<span class="button-82-shadow"></span>
+							<span class="button-82-edge"></span>
+							<span class="button-82-front text">
+								<a>Перезапустить симуляцию</a>
+							</span>
+						</button>
 						</button>
 						<button onclick="sendMyData('pause');" class="button-82-pushable" role="button">
 							<span class="button-82-shadow"></span>
 							<span class="button-82-edge"></span>
 							<span class="button-82-front text">
-								<a id="pause">▶</a>
+								<img height="22" width="20" src="/static/pause.svg" id="pause">
 							</span>
 						</button>
 						<button onclick="tryResetting()" class="button-82-pushable" role="button">
 							<span class="button-82-shadow"></span>
 							<span class="button-82-edge"></span>
 							<span class="button-82-front text">
-								<a>Перезапустить симуляцию</a>
+								<a>Сохранить запись</a>
 							</span>
 						</button>
 						<button onclick="playRecording()" class="button-82-pushable" role="button">
@@ -57,10 +64,9 @@
 						<canvas class="canvas" width=1000 height=1000 id="main"></canvas>
 					</div>
 					<div class="lesser-wrapper">
-						<canvas id="sliderCanvas" class="sliders-box" width=500 height=500 onmousedown="keyDown();" onmousemove="mouseMoveHandler();" onmouseup="keyUp();">
-						</canvas>
+						<canvas id="sliderCanvas" class="sliders-box" width=500 height=500 onmousedown="keyDown();" onclick="keyDown();mouseMoveHandler();keyUp();" onmousemove="mouseMoveHandler();" onmouseup="keyUp();"></canvas>
 						<div>
-							<canvas class="graph-canvas" width=500 height=500 id="graph" onmousedown="keyDown(1);" onmousemove="mouseMoveHandler(1);" onmouseup="keyUp(1);"></canvas>
+							<canvas class="graph-canvas" width=500 height=500 id="graph" onmousedown="keyDown(1);" onclick="keyDown(1);mouseMoveHandler(1);keyUp(1);" onmousemove="mouseMoveHandler(1);" onmouseup="keyUp(1);"></canvas>
 						</div>
 					</div>
 					<div class="lesser-wrapper2" id="checkboxes">

@@ -149,6 +149,9 @@ class Oscillations:
             arr.append(i)
         return arr
 
+    def react_click(self):#should be in every model
+        pass
+
     def tick_move(self):
         self.log_state()
         self.periodic_time += 1

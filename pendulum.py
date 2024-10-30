@@ -1,5 +1,8 @@
+import math
+
 from vector import Vector, projections
 from log_parser import cut_log
+from math import sin, cos, asin, atan
 
 
 class Pendulum(Vector):#representation of pendulum in memory
@@ -16,31 +19,41 @@ class Pendulum(Vector):#representation of pendulum in memory
                 "hardset_kinetic_energy",
                 "set_speed",
                 "set_base_length",
-                "set_gravity"
+                "set_gravity",
+                "set_potential_energy",
+                "set_angle"
             ],
             "getters": [
                 "get_kinetic_energy",
                 "get_speed",
                 "get_base_length",
-                "get_gravity"
+                "get_gravity",
+                "get_potential_energy",
+                "get_angle"
             ],
             "names": [
                 "Кинетическая энергия",
                 "Скорость",
                 "Длина",
-                "Ускорение свободного падения"
+                "Ускорение свободного падения",
+                "Потенциальная энергия",
+                "Угол отклонения (в градусах)"
             ],
             "modifiers": [
                 "10",
                 "20",
                 "0.5",
-                "2000"
+                "2000",
+                "10",
+                "5"
             ],
             "shifts": [
                 "0",
                 "0",
                 "0",
-                "0"
+                "0",
+                "0",
+                "250"
             ]
         }
         self.log = {
@@ -95,6 +108,12 @@ class Pendulum(Vector):#representation of pendulum in memory
         elif data == "3":
             for i in range(len(self.log["gravity"]["x"])):
                 arr.append((self.log["gravity"]["x"][i] ** 2 + self.log["gravity"]["y"][i] ** 2) ** 0.5)
+        elif data == "4":
+            for i in range(len(self.log["self"]["y"])):
+                arr.append((self.log["gravity"]["x"][i] ** 2 + self.log["gravity"]["y"][i] ** 2) ** 0.5 * (self.starting_point_y + self.baseLength - self.log["self"]["y"][i]))
+        elif data == "5":
+            for i in range(len(self.log["self"]["x"])):
+                arr.append(atan(self.log["self"]["x"][i] / self.log["self"]['y'][i]) * 180 / math.pi)
         for i in range(len(arr)):
             arr[i] *= float(self.setters_and_getters["modifiers"][int(data)])
             arr[i] = str(arr[i])
@@ -134,6 +153,11 @@ class Pendulum(Vector):#representation of pendulum in memory
         #print(self.x + self.starting_point_x, self.y + self.starting_point_y)
         #animator.goto(self.x + self.starting_point_x, self.y + self.starting_point_y)
         draw_string = ""
+        r = (self.baseLength ** 2 - ((self.full_energy / self.gravity.length()) - self.starting_point_y - self.baseLength) ** 2) ** 0.5
+        draw_string += animator.circle(self.starting_point_x, self.starting_point_y + 500, r, "2", "lightgrey")
+        y2 = self.starting_point_y + 500 + self.speed.x / abs(self.speed.x + 0.00001) * (r ** 2 - self.x ** 2) ** 0.5
+        draw_string += animator.circle(self.starting_point_x + self.x, y2, 4, "8", "red")
+        draw_string += animator.line(self.starting_point_x + self.x, y2, self.starting_point_x + self.x, self.starting_point_y + self.y, 1, "red")
         draw_string += animator.pendulum(self.starting_point_x + self.x, self.starting_point_y + self.y, 40)
         draw_string += animator.line(self.starting_point_x, self.starting_point_y, self.starting_point_x + self.x, self.starting_point_y + self.y, "3", "black")
         draw_string += animator.vector(self.starting_point_x + self.x, self.starting_point_y + self.y, self.starting_point_x + self.x + self.speed.x * 30, self.starting_point_y + self.y + self.speed.y * 30, "6", "green")
@@ -143,6 +167,12 @@ class Pendulum(Vector):#representation of pendulum in memory
 
     def get_working_vectors(self):#should be in every model
         return [self, self.gravity, self.tension, self.speed]
+
+    def react_click(self, x, y):#should be in every model
+        self.x = x - self.starting_point_x
+        self.y = y - self.starting_point_y
+        self.set_base_length(((x - self.starting_point_x) ** 2 + (y - self.starting_point_y) ** 2) ** 0.5)
+        pass
 
     def store_sliders(self):
         self.sliders = ""
@@ -178,6 +208,7 @@ class Pendulum(Vector):#representation of pendulum in memory
 
     def set_gravity(self, num):
         self.gravity.y = num
+        self.recalculate_full_energy()
 
     def hardset_kinetic_energy(self, num):
         self.speed.set_length(abs(num * 2) ** 0.5 * num/abs(num))
@@ -185,6 +216,23 @@ class Pendulum(Vector):#representation of pendulum in memory
 
     def get_potential_energy(self):
         return self.gravity.length() * (self.starting_point_y + self.baseLength - self.y)
+
+    def set_potential_energy(self, num):
+        length = -(num / self.gravity.length()) + self.starting_point_y + self.baseLength
+        if type(length) == type(0.0):
+            self.y = length
+            self.x = (self.baseLength ** 2 - length ** 2) ** 0.5
+            self.recalculate_full_energy()
+
+    def get_angle(self):
+        try:
+            return math.asin(self.x / self.baseLength) / math.pi * 180
+        except:
+            return 0
+
+    def set_angle(self, angle):
+        self.x = sin(angle / 180 * math.pi) * self.baseLength
+        self.y = cos(angle / 180 * math.pi) * self.baseLength
 
     def tick1(self):
         self.model_implications()
@@ -195,7 +243,11 @@ class Pendulum(Vector):#representation of pendulum in memory
 
     def model_implications(self):
         if self.y < self.starting_point_y:
-            self.speed.zero_out()
+            self.speed.x = 0
+            self.speed.y = -self.speed.y
+            self.y = self.starting_point_y
+            self.x = self.baseLength * self.x / abs(self.x)
+            return
         self.set_length(self.baseLength)
         a = self.judge_speed_direction()
         self.speed.turn_to(-self.x, -self.y)

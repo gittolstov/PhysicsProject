@@ -1,5 +1,8 @@
+import math
+
 from vector import Vector, projections
 from log_parser import cut_log
+from math import atan, sin, cos
 
 
 class Cosmic_velocity(Vector):
@@ -9,26 +12,29 @@ class Cosmic_velocity(Vector):
         self.starting_point_x = 500
         self.starting_point_y = 500
         self.reset()
+        self.gravitationalConstant = 3.5 * 10 ** (-22)
+        self.length_multiplier = 31855
+        self.speed_multiplier = 2.5
 
     def reset(self):#should be in every model
         self.setters_and_getters = {#should be in every model
             "setters": [
-                "set_mass",
+                "set_mass_public",
                 "set_size",
-                "set_speed",
-                "set_height",
-                "set_kinetic",
-                "set_potential",
+                "set_speed_public",
+                "set_height_public",
+                "set_kinetic_public",
+                "set_potential_public",
                 "set_force",
                 "set_velocity"
             ],
             "getters": [
-                "get_mass",
+                "get_mass_public",
                 "get_size",
-                "get_speed",
-                "get_height",
-                "get_kinetic",
-                "get_potential",
+                "get_speed_public",
+                "get_height_public",
+                "get_kinetic_public",
+                "get_potential_public",
                 "get_force",
                 "get_velocity"
             ],
@@ -43,14 +49,14 @@ class Cosmic_velocity(Vector):
                 "Космическая скорость (по индексу)"
             ],
             "modifiers": [
-                "0.04",
-                "1",
+                "0.00000000000000000000002",
+                "0.000025",
                 "40",
-                "1",
-                "10",
-                "10",
-                "1000",
-                "225"
+                "0.00002",
+                "4",
+                "4",
+                "10000",
+                "200"
             ],
             "shifts": [
                 "0",
@@ -117,39 +123,42 @@ class Cosmic_velocity(Vector):
         parsed = data.split(" ")
         arr = []
         if data == "0":
-            arr = self.log["gMm"].copy()
+            for i in range(len(self.log["gMm"])):
+                arr.append(self.log["gMm"][i] / self.gravitationalConstant)
         elif data == "1":
-            arr = self.log["size"].copy()
+            for i in range(len(self.log["size"])):
+                arr.append(self.log["size"][i] * self.length_multiplier * 2)
         elif data == "2":
             for i in range(len(self.log["speed"]["x"])):
-                arr.append((self.log["speed"]["x"][i] ** 2 + self.log["speed"]["y"][i] ** 2) ** 0.5)
+                arr.append((self.log["speed"]["x"][i] ** 2 + self.log["speed"]["y"][i] ** 2) ** 0.5 * self.speed_multiplier)
         elif data == "3":
-            arr = self.log["self"]["length"]
+            for i in range(len(self.log["self"]["length"])):
+                arr.append(self.log["self"]["length"][i] * self.length_multiplier)
         elif data == "4":
             for i in range(len(self.log["speed"]["x"])):
-                arr.append((self.log["speed"]["x"][i] ** 2 + self.log["speed"]["y"][i] ** 2) / 2)
+                arr.append((self.log["speed"]["x"][i] ** 2 + self.log["speed"]["y"][i] ** 2) * self.speed_multiplier ** 2 / 2)
         elif data == "5":#potential
             for i in range(len(self.log["self"]["length"])):
                 if self.log["self"]["length"][i] == 0:
                     arr.append(1000000)
                     continue
-                arr.append(-self.log["gMm"][i] / self.log["self"]["length"][i])
+                arr.append(-self.log["gMm"][i] * self.speed_multiplier ** 2 / float(self.log["self"]["length"][i]))
         elif data == "6":
             for i in range(len(self.log["self"]["length"])):
                 if self.log["self"]["length"][i] == 0:
                     arr.append(1000000)
                     continue
-                arr.append(self.log["gMm"][i] / self.log["self"]["length"][i] ** 2)
+                arr.append(float(self.log["gMm"][i]) / float(self.log["self"]["length"][i]) ** 2)
         elif data == "7":
             for i in range(len(self.log["speed"]["x"])):
-                if (self.log["speed"]["x"][i] ** 2 + self.log["speed"]["y"][i] ** 2) ** 0.5 >= (self.log["gMm"][i] / self.log["self"]["length"][i]) ** 0.5:
+                if (float(self.log["speed"]["x"][i]) ** 2 + float(self.log["speed"]["y"][i]) ** 2) ** 0.5 >= (((self.log["gMm"][i] / float(self.log["self"]["length"][i])) * 2) ** 0.5):
                     arr.append(2)
-                    continue
-                if (self.log["speed"]["x"][i] ** 2 + self.log["speed"]["y"][i] ** 2) ** 0.5 >= (self.log["gMm"][i] / self.log["self"]["length"][i] * 2) ** 0.5:
+                elif (float(self.log["speed"]["x"][i]) ** 2 + float(self.log["speed"]["y"][i]) ** 2) ** 0.5 >= ((self.log["gMm"][i] / float(self.log["self"]["length"][i])) ** 0.5):
                     arr.append(1)
-                    continue
-                arr.append(0)
+                else:
+                    arr.append(0)
         for i in range(len(arr)):
+            arr[i] = float(arr[i])
             arr[i] *= float(self.setters_and_getters["modifiers"][int(data)])
             arr[i] = str(arr[i])
         return arr
@@ -170,7 +179,7 @@ class Cosmic_velocity(Vector):
         self.log["speed"]["x"].append(self.speed.x)
         self.log["speed"]["y"].append(self.speed.y)
         self.log["gravity"]["x"].append(self.gravity.x)
-        self.log["gravity"]["y"].append(self.gravity.x)
+        self.log["gravity"]["y"].append(self.gravity.y)
         self.log["gMm"].append(self.gMm)
         self.log["size"].append(self.planet_size)
         self.log["full_energy"].append(self.full_energy)
@@ -229,6 +238,19 @@ class Cosmic_velocity(Vector):
     def get_working_vectors(self):#should be in every model
         return [self, self.gravity, self.speed]
 
+    def react_click(self, x, y):#should be in every model
+        angle_shift = atan((y - self.starting_point_y) / (x - self.starting_point_x + 0.01)) + math.pi * ((x - self.starting_point_y) < 0)
+        angle0 = atan(self.y / (self.x + 0.01)) + math.pi * (self.x < 0)
+        sp0x = self.speed.x
+        sp0y = self.speed.y
+        self.x = x - self.starting_point_x
+        self.y = y - self.starting_point_y
+        self.speed.x = cos(angle_shift - angle0) * sp0x - sin(angle_shift - angle0) * sp0y
+        self.speed.y = sin(angle_shift - angle0) * sp0x + cos(angle_shift - angle0) * sp0y
+        self.time_without_interruption = self.time
+        self.apogee.isDefined = False
+        self.gravity.tick2()
+
     def apply_forces(self):
         for a in self.force_applications:
             self.x += a.x
@@ -259,35 +281,51 @@ class Cosmic_velocity(Vector):
         if a == 2:
             self.set_speed(self.cosmic_velocity2())
 
-    def get_height(self):
-        return self.length()
+    def get_height_public(self):
+        return round(self.length() * self.length_multiplier)
 
     def set_height(self, height):
         self.time_without_interruption = self.time
         self.apogee.isDefined = False
         self.set_length(height)
+    def set_height_public(self, height):
+        self.time_without_interruption = self.time
+        self.apogee.isDefined = False
+        self.set_length(height / self.length_multiplier)
 
     def get_speed(self):
         return self.speed.length()
+    def get_speed_public(self):
+        return self.speed.length() * self.speed_multiplier
 
     def set_speed(self, speed):
         self.time_without_interruption = self.time
         self.apogee.isDefined = False
         self.speed.set_length(speed)
+    def set_speed_public(self, speed):
+        self.set_speed(speed / self.speed_multiplier)
 
     def get_mass(self):
         return self.gMm
+    def get_mass_public(self):
+        return self.gMm / self.gravitationalConstant
 
     def set_mass(self, mass):
         self.time_without_interruption = self.time
         self.apogee.isDefined = False
         self.gMm = mass
+    def set_mass_public(self, mass):
+        self.set_mass(mass * self.gravitationalConstant)
 
     def get_kinetic(self):
         return self.speed.length() ** 2 / 2
+    def get_kinetic_public(self):
+        return self.get_kinetic() * self.speed_multiplier ** 2
 
     def set_kinetic(self, kin):#already included
         self.set_speed((2 * kin) ** 0.5)
+    def set_kinetic_public(self, kin):#already included
+        self.set_kinetic(kin / self.speed_multiplier ** 2)
 
     def softset_kinetic(self, kin):#does not count as intervention
         self.speed.set_length((2 * kin) ** 0.5)
@@ -295,20 +333,26 @@ class Cosmic_velocity(Vector):
     def get_potential(self):
         if self.length() == 0: return 0
         return -self.gMm / self.length()
+    def get_potential_public(self):
+        if self.length() == 0: return 0
+        return -self.gMm * self.speed_multiplier ** 2 / self.length()
 
     def set_potential(self, pot):#already included
         if pot == 0: return
         self.set_height(-self.gMm / pot)
-
-    def softset_potential(self, pot):#does not count as intervention
+    def set_potential_public(self, pot):#already included
         if pot == 0: return
-        self.set_length(-self.gMm / pot)
+        self.set_height(-self.gMm * self.speed_multiplier ** 2 / pot)
 
-    def get_size(self):
-        return self.planet_size
+    # def softset_potential(self, pot):#does not count as intervention
+    #     if pot == 0: return
+    #     self.set_length(-self.gMm / pot)
 
-    def set_size(self, size):
-        self.planet_size = size
+    def get_size(self):#doesn't have other usage
+        return self.planet_size * self.length_multiplier * 2
+
+    def set_size(self, size):#doesn't have other usage
+        self.planet_size = size / self.length_multiplier / 2
 
     def get_force(self):
         if self.length() == 0: return
@@ -361,8 +405,14 @@ class Cosmic_velocity(Vector):
                 self.full_energy = (self.apogeic_speed.x ** 2 + self.apogeic_speed.y ** 2) / 2 - self.gMm / a[i]
                 self.apogee.isDefined = True
                 return
-            if p < a[i]:
-                going_up = True
+            try:
+                if p < a[i]:
+                    going_up = True
+            except:
+                print("fatal error")
+                print(a)
+                print(a[i])
+                a[i] = 100
             p = a[i]
 
     def store_sliders(self):#should be in every model

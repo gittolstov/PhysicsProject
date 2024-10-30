@@ -72,10 +72,21 @@ class Slider{
 		can.fillStyle = "indigo";//text
 		can.font = "22px Arial";
 		can.fillText(this.text, Math.ceil(x1 + x2 / 4), Math.floor(y1 - y2 * 0.15));
+		can.fillStyle = lookupColors[this.id];//color marker
+		can.fillRect(x1 + x2 / 4 - 15, y1 - y2 * 0.15 - 10, 10, 10);
 	}
 
 	switchGraph(bool){
 	    console.log(bool);
+	    if (bool){
+	        lastGraph = this.id;
+	    } else if (lastGraph === this.id){
+	        for (let a in slidersList){
+	            if (slidersList[a].isChecked){
+	                lastGraph = a;
+	            }
+	        }
+	    }
 	    this.isChecked = bool;
 	}
 
@@ -146,7 +157,7 @@ class TimeSlider{
 
 	react(num){
 		if (this.active){
-			this.modifier(num * 2);// * 20 / 10
+			this.modifier(num);// * 20 / 10
 			return;
 		}
 	}
@@ -156,7 +167,7 @@ class TimeSlider{
 	}
 
 	setter(){
-		this.offset = slidersReceived.time / 20;
+		this.offset = slidersReceived.time / 10;
 		this.draw()
 	}
 }

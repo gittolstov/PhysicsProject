@@ -36,8 +36,9 @@ function sendMyData(something){
 }
 
 let slidersList = [];
+let lastGraph = 0;
 let slidersReceived = {time: 0}
-let lookupColors = ["red", "orange", "yellow", "green", "blue", "magenta", "black", "brown", "pink"];
+let lookupColors = ["red", "orange", "green", "blue", "magenta", "black", "brown", "pink"];
 timeSlider = new TimeSlider();
 
 function receiveSliders(){
@@ -56,7 +57,7 @@ function receiveSliders(){
 	})
 }
 
-function graph(num){//legacy
+function graph(num){
     if (num == ""){
         animation.drawGraph();
         return;
@@ -69,12 +70,13 @@ function graph(num){//legacy
 	.then(function(text) {
 		let parsed = text.split(";");
         animation.drawGraph();
+        animation.graphValues(slidersList[parseFloat(lastGraph)].modifieR);
 	    timeSlider.draw();
         for (let a in parsed){
             animation.graphCanvas.strokeStyle = lookupColors[num[a]]
             b = parsed[parseFloat(a)].split(" ")
             for (let i in b){
-				animation.graphLine(i / 20, parseFloat(b[i]));
+				animation.graphLine(i / 10, parseFloat(b[i]) / 2);
             }
             animation.gx = 0
             animation.gy = 500
@@ -82,10 +84,27 @@ function graph(num){//legacy
 	})
 }
 
-function playRecording(){
+function postClick(){
+    let x = event.offsetX
+    let y = event.offsetY
+	let url = '/click/' + x + "_" + y;
+	fetch(url)
+	.then(function(response) {
+		return response.text();
+	})
+	.then(function(text) {
+	    //nothing
+	})
+}
+
+function playRecording(name){
+	sendMyData("recording " + name);
+}
+
+function requestRecording(){
     if (animation.playbackButton.innerHTML === "Выключить запись"){
 		sendMyData("playforth")
-        return
+        return;
     }
 	let url = '/playback_names';
 	fetch(url)
@@ -93,12 +112,13 @@ function playRecording(){
 		return response.text();
 	})
 	.then(function(text) {
-		let prmt = prompt("Выберите запись из списка сохранённых:" + text)
-		if (prmt === null){
-			return
-		}
-		sendMyData("recording " + prmt)
-        setTimeout(requestSliders, 500)
+	    let data = text.split("\n");
+	    let list = "";
+	    for (let a in data){
+	        if (data[a] === ""){continue}
+	        list += '<p onclick="playRecording(' + "'" + data[a] + "'" + ')">' + data[a] + '</p>';
+	    }
+	    document.getElementById("playbackDropdown").innerHTML = list;
 	})
 }
 
@@ -136,6 +156,7 @@ function reset(){
 }
 
 requestSliders();
+requestRecording();
 
 /*let getMyData = function () {
     let url = '/get_data';

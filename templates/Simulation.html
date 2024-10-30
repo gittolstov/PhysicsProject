@@ -51,17 +51,21 @@
 								<a>Сохранить запись</a>
 							</span>
 						</button>
-						<button onclick="playRecording()" class="button-82-pushable" role="button">
+						<button class="button-82-pushable" role="button">
 							<span class="button-82-shadow"></span>
 							<span class="button-82-edge"></span>
 							<span class="button-82-front text">
-								<a id="playback">Включить.. запись</a>
+								<div class="dropdown">
+									<span id="playback">Включить.. запись</span>
+									<div id="playbackDropdown" class="dropdown-content">
+									</div>
+								</div>
 							</span>
 						</button>
 				</div>
 				<div class="content-wrapper">
 					<div class="lesser-wrapper">
-						<canvas class="canvas" width=1000 height=1000 id="main"></canvas>
+						<canvas class="canvas" width=1000 height=1000 id="main" onclick="postClick()"></canvas>
 					</div>
 					<div class="lesser-wrapper">
 						<canvas id="sliderCanvas" class="sliders-box" width=500 height=500 onmousedown="keyDown();" onclick="keyDown();mouseMoveHandler();keyUp();" onmousemove="mouseMoveHandler();" onmouseup="keyUp();"></canvas>

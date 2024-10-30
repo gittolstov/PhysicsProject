@@ -60,12 +60,19 @@ def ret6():
 
 @app.route("/playback_names")
 def ret7():
-    return "\n" + "\n".join(parser.readfile()[0])
+    return "\n".join(parser.readfile()[0])
 
 
 @app.route("/energy")
 def ret8():
     return str(main.model.get_kinetic()) + str(main.model.get_potential())
+
+
+@app.route("/click/<point>")
+def ret9(point):
+    data = point.split("_")
+    main.model.react_click(float(data[0]), float(data[1]))
+    return ";".join(data)
 
 
 @app.route('/event', methods=["POST"])

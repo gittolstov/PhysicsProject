@@ -172,13 +172,23 @@ class Animation{
 	*/drawGraph(){//кадр отрисовки графика
 		this.graphCanvas.fillStyle = "rgba(214, 235, 242)";
 		this.graphCanvas.fillRect(0,0,500,500);
-		this.graphCanvas.fillStyle = "rgba(255, 255, 255, 0.5)";
+		this.graphCanvas.fillStyle = "black";
 		this.graphCanvas.fillRect(0, 249, 500, 2);
+		this.graphCanvas.fillStyle = "rgba(255, 255, 255, 0.5)";
 		for (let a = 0; a < 20; a++){
 		    this.graphCanvas.fillRect(a * 25, 0, 2, 500);
 		}
 		for (let a = 0; a < 20; a++){
 		    this.graphCanvas.fillRect(0, a * 25, 500, 2);
+		}
+	}
+
+	graphValues(scale){
+		this.graphCanvas.fillStyle = 'black';
+		this.graphCanvas.font = "15px Arial";
+		for (let a = 1; a <= 4; a++){
+    		this.graphCanvas.fillText(a / scale * 100 + "", 0, 250 - a * 50);
+	    	this.graphCanvas.fillText(-a / scale * 100 + "", 0, 250 + a * 50);
 		}
 	}/*
 
@@ -189,13 +199,14 @@ class Animation{
 
 	*/graphLine(x, y){
 		this.graphCanvas.beginPath();
-		this.graphCanvas.lineWidth = 2;
+		this.graphCanvas.lineWidth = 3;
 		this.graphCanvas.moveTo(this.gx, this.gy);
 		this.graphCanvas.lineTo(x, -y + 250);
 		this.graphCanvas.stroke();
 		this.gx = x;
 		this.gy = -y + 250;
 	}
+
 
 	modifyContextMatrix(angle, xShift, yShift, xTurn = 1, yTurn = 1){
 		this.masterCanvas.save();

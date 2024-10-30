@@ -160,6 +160,11 @@ class Pendulum(Vector):#representation of pendulum in memory
         draw_string += animator.line(self.starting_point_x + self.x, y2, self.starting_point_x + self.x, self.starting_point_y + self.y, 1, "red")
         draw_string += animator.pendulum(self.starting_point_x + self.x, self.starting_point_y + self.y, 40)
         draw_string += animator.line(self.starting_point_x, self.starting_point_y, self.starting_point_x + self.x, self.starting_point_y + self.y, "3", "black")
+        sc = self.gravity.x * self.speed.x + self.gravity.y * self.speed.y
+        temp = projections(self.speed.x, self.speed.y, sc / self.speed.length())
+        temp["x"] *= 1000
+        temp["y"] *= 1000
+        draw_string += animator.vector(self.starting_point_x + self.x, self.starting_point_y + self.y, self.starting_point_x + self.x + temp["x"], self.starting_point_y + self.y + temp["y"], "6", "lightblue")
         draw_string += animator.vector(self.starting_point_x + self.x, self.starting_point_y + self.y, self.starting_point_x + self.x + self.speed.x * 30, self.starting_point_y + self.y + self.speed.y * 30, "6", "green")
         draw_string += animator.vector(self.starting_point_x + self.x, self.starting_point_y + self.y, self.starting_point_x + self.x + self.tension.x * 1000, self.starting_point_y + self.y + self.tension.y * 1000, "4", "red")
         draw_string += animator.vector(self.starting_point_x + self.x, self.starting_point_y + self.y, self.starting_point_x + self.x + self.gravity.x * 1000, self.starting_point_y + self.y + self.gravity.y * 1000, "4", "blue")

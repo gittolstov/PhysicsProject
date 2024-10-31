@@ -55,7 +55,7 @@ class Cosmic_velocity(Vector):
                 "0.00002",
                 "4",
                 "4",
-                "10000",
+                "50",
                 "200"
             ],
             "shifts": [
@@ -148,7 +148,7 @@ class Cosmic_velocity(Vector):
                 if self.log["self"]["length"][i] == 0:
                     arr.append(1000000)
                     continue
-                arr.append(float(self.log["gMm"][i]) / float(self.log["self"]["length"][i]) ** 2)
+                arr.append(float(self.log["gMm"][i]) * 200 / float(self.log["self"]["length"][i]) ** 2)
         elif data == "7":
             for i in range(len(self.log["speed"]["x"])):
                 if (float(self.log["speed"]["x"][i]) ** 2 + float(self.log["speed"]["y"][i]) ** 2) ** 0.5 >= (((self.log["gMm"][i] / float(self.log["self"]["length"][i])) * 2) ** 0.5):
@@ -210,7 +210,7 @@ class Cosmic_velocity(Vector):
         draw_string += animator.planet(self.starting_point_x, self.starting_point_y, self.planet_size * 1.1)
         draw_string += animator.ship(self.starting_point_x + self.x, self.starting_point_y + self.y, self.speed.x, self.speed.y)
         draw_string += animator.vector(self.starting_point_x + self.x, self.starting_point_y + self.y, self.starting_point_x + self.x + self.speed.x * 50, self.starting_point_y + self.y + self.speed.y * 50, "5", "green")
-        draw_string += animator.vector(self.starting_point_x + self.x, self.starting_point_y + self.y, self.starting_point_x + self.x + self.gravity.x * 3000, self.starting_point_y + self.y + self.gravity.y * 3000, "5", "grey")
+        draw_string += animator.vector(self.starting_point_x + self.x, self.starting_point_y + self.y, self.starting_point_x + self.x + self.gravity.x * 3000, self.starting_point_y + self.y + self.gravity.y * 3000, "5", "brown")
         for i in self.orbit_marks:
             draw_string += animator.line(self.starting_point_x + i[0], self.starting_point_y + i[1], self.starting_point_x + i[0] + 1, self.starting_point_y + i[1] + 1, 1, "blue")
         if self.apogee.isDefined:
@@ -354,12 +354,12 @@ class Cosmic_velocity(Vector):
     def set_size(self, size):#doesn't have other usage
         self.planet_size = size / self.length_multiplier / 2
 
-    def get_force(self):
+    def get_force(self):#doesn't have other usage
         if self.length() == 0: return
-        return self.gMm / self.length() ** 2
+        return self.gMm / self.length() ** 2 * 200
 
-    def set_force(self, force):
-        self.gMm = force * self.length() ** 2
+    def set_force(self, force):#doesn't have other usage
+        self.gMm = force / 200 * self.length() ** 2
 
     def tick2(self):
         self.model_implications()

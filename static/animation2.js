@@ -52,6 +52,10 @@ class Animation{
 
 	line(args){
 		this.masterCanvas.beginPath();
+		if (args[6].startsWith("rgb")){
+		    let a = args[6].split(":");
+		    args[6] = a.join(", ");
+		}
 		this.masterCanvas.moveTo(parseFloat(args[1]), parseFloat(args[2]));
 		this.masterCanvas.lineTo(parseFloat(args[3]), parseFloat(args[4]));
 		this.masterCanvas.strokeStyle = args[6];

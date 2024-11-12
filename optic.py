@@ -1,8 +1,8 @@
-from math import sin, cos, atan
+from math import sin, cos, atan, pi, asin
 
 
 class Optic:
-    def __init__(self, x=500, y=500, length=400, angle=90):
+    def __init__(self, x=500, y=500, length=400, angle=0):
         self.base_values = [x, y, length, angle]
         self.starting_point_x = x
         self.starting_point_y = y
@@ -11,17 +11,19 @@ class Optic:
     def reset(self):#should be in every model
         self.setters_and_getters = {#should be in every model
             "setters": [
-                "hardset_kinetic_energy",
-                "set_speed",
-                "set_base_length",
+                "set_angle",
+                "set_refraction",
+                "set_optic1",
+                "set_optic2",
                 "set_red",
                 "set_green",
                 "set_blue"
             ],
             "getters": [
-                "get_red",
-                "get_red",
-                "get_red",
+                "get_angle",
+                "get_refraction_public",
+                "get_optic1",
+                "get_optic2",
                 "get_red",
                 "get_green",
                 "get_blue"
@@ -29,27 +31,29 @@ class Optic:
             "names": [
                 "Угол падения (в градусах)",
                 "Угол преломления",
-                "Оптическая плотность - верх",
-                "Оптическая плотность - низ",
+                "Оптическая плотность - право",
+                "Оптическая плотность - лево",
                 "Красный",
                 "Зелёный",
                 "Синий"
             ],
             "modifiers": [
-                "10",
-                "20",
-                "0.5",
-                "2000",
-                "10",
-                "5"
+                "0.25",
+                "0.25",
+                "200",
+                "200",
+                "400",
+                "400",
+                "400"
             ],
             "shifts": [
+                "250",
+                "250",
+                "-200",
+                "-200",
                 "0",
                 "0",
-                "0",
-                "0",
-                "0",
-                "250"
+                "0"
             ]
         }
         self.angle = self.base_values[3]
@@ -58,10 +62,51 @@ class Optic:
         self.red = 255
         self.green = 0
         self.blue = 0
+        self.optic1 = 1
+        self.optic2 = 1
         self.time = 0
 
+    def get_graph(self, data):#should be in every model, returns graph arrays for each slider
+        return []
+
+    def log_state(self):#should be in every model
+        pass
+
+    def apply_log(self, log, frame):#should be in every model, applies frames from log
+        pass
+
+    def draw(self, animator):#should be in every model
+        draw_string = ""
+        x = self.baseLength * cos(self.angle)
+        y = -self.baseLength * sin(self.angle)
+        angl = self.get_refraction() / 180 * pi
+        x2 = 1000 * cos(angl)
+        y2 = -1000 * sin(angl)
+        draw_string += animator.circle(self.starting_point_x, self.starting_point_y, 150, "300", "blue")
+        draw_string += animator.circle(self.starting_point_x + x, self.starting_point_y + y, 10, "20", "black")
+        draw_string += animator.line(self.starting_point_x + x, self.starting_point_y + y, self.starting_point_x, self.starting_point_y, 4, self.get_color())
+        draw_string += animator.line(self.starting_point_x + x2, self.starting_point_y + y2, self.starting_point_x, self.starting_point_y, 4, self.get_color())
+        self.store_sliders()
+        return draw_string
+
+    def get_working_vectors(self):#should be in every model
+        return []
+
+    def react_click(self, x, y):#should be in every model
+        x2 = x - self.starting_point_x
+        y2 = y - self.starting_point_y
+        if x2 > 0:
+            self.angle = atan(-y2 / x2)
+        else:
+            self.set_refraction(atan(y2 / x2) / pi * 180 + 180)
+
+    def store_sliders(self):#should be in every model
+        self.sliders = ""
+        for i in self.setters_and_getters["getters"]:
+            self.sliders += i + " " + str(getattr(self, i)()) + ";"
+
     def get_color(self):
-        return f"rgb({self.red}, {self.green}, {self.blue})"
+        return f"rgb({self.red}:{self.green}:{self.blue})"
 
     def get_red(self):
         return self.red / 255
@@ -77,33 +122,35 @@ class Optic:
     def set_blue(self, num):
         self.blue = num * 255
 
-    def get_graph(self, data):#should be in every model, returns graph arrays for each slider
-        return []
+    def get_angle(self):
+        return self.angle * 180 / pi
 
-    def log_state(self):#should be in every model
-        pass
+    def set_angle(self, num):#deg
+        if abs(num) <= 90:
+            self.angle = num * pi / 180
 
-    def apply_log(self, log, frame):#should be in every model, applies frames from log
-        pass
+    def get_refraction(self):
+        if abs(sin(self.angle) / self.optic1 * self.optic2) >= 1:
+            a = -self.angle
+            print(self.angle)
+        else:
+            a = asin(sin(self.angle) / self.optic1 * self.optic2) + pi
+        return a * 180 / pi #deg
 
-    def draw(self, animator):#should be in every model
-        draw_string = ""
-        x = self.baseLength * cos(self.angle)
-        y = -self.baseLength * sin(self.angle)
-        draw_string += animator.circle(self.starting_point_x, self.starting_point_y, 150, "300", "blue")
-        draw_string += animator.circle(self.starting_point_x + x, self.starting_point_y + y, 10, "20", "black")
-        self.store_sliders()
-        return draw_string
+    def get_refraction_public(self):
+        return self.get_refraction() - 180
 
-    def get_working_vectors(self):#should be in every model
-        return []
+    def set_refraction(self, num):#deg
+            self.angle = asin(sin(num / 180 * pi) / self.optic2 * self.optic1)
 
-    def react_click(self, x, y):#should be in every model
-        x2 = x - self.starting_point_x
-        y2 = y - self.starting_point_y
-        self.angle = atan(-y2 / x2)
+    def get_optic1(self):
+        return self.optic1
 
-    def store_sliders(self):#should be in every model
-        self.sliders = ""
-        for i in self.setters_and_getters["getters"]:
-            self.sliders += i + " " + str(getattr(self, i)()) + ";"
+    def set_optic1(self, num):
+        self.optic1 = num
+
+    def get_optic2(self):
+        return self.optic2
+
+    def set_optic2(self, num):
+        self.optic2 = num

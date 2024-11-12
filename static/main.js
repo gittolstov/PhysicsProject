@@ -123,21 +123,27 @@ function requestRecording(){
 }
 
 function switchPendulum(){
-    sendMyData("model_pendulum")
-    sendMyData("only_pause")
-    setTimeout(requestSliders, 500)
+    sendMyData("model_pendulum");
+    sendMyData("only_pause");
+    setTimeout(requestSliders, 500);
 }
 
 function switchCosmic(){
-    sendMyData("model_cosmic")
-    sendMyData("only_pause")
-    setTimeout(requestSliders, 500)
+    sendMyData("model_cosmic");
+    sendMyData("only_pause");
+    setTimeout(requestSliders, 500);
 }
 
 function switchElectro(){
-    sendMyData("model_electro")
-    sendMyData("only_pause")
-    setTimeout(requestSliders, 500)
+    sendMyData("model_electro");
+    sendMyData("only_pause");
+    setTimeout(requestSliders, 500);
+}
+
+function switchOptic(){
+    sendMyData("model_optic");
+    sendMyData("only_pause");
+    setTimeout(requestSliders, 500);
 }
 
 function tryResetting(){

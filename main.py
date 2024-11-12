@@ -3,6 +3,7 @@ from flask_cors import CORS, cross_origin
 from pendulum import *
 from cosmic_velocity import Cosmic_velocity
 from electromagnetic_oscillations import Oscillations
+from optic import Optic
 from log_parser import *
 import threading
 import turtle
@@ -88,7 +89,8 @@ class Main:
         self.model_list = {
             "Pendulum": PENDULUM,
             "Cosmic_velocity": COSMIC,
-            "Oscillations": ELECTRO
+            "Oscillations": ELECTRO,
+            "Optic": OPTIC
         }
         self.animator = Animator()
         self.vectors = []
@@ -117,6 +119,9 @@ class Main:
         elif event == "model_electro":
             self.end_playback()
             self.reset_model(ELECTRO)
+        elif event == "model_optic":
+            self.end_playback()
+            self.reset_model(OPTIC)
         elif event == "reset":
             self.end_playback()
             self.model.reset()
@@ -264,6 +269,7 @@ if __name__ == "__main__":
     PENDULUM = Pendulum()
     COSMIC = Cosmic_velocity()
     ELECTRO = Oscillations()
+    OPTIC = Optic()
     main = Main()
     parser = Log_parser()
     main.add_model(ELECTRO)

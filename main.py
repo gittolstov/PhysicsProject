@@ -232,6 +232,9 @@ class Animator:
         """ship = 7"""
         """pendulum = 8"""
         """explosion = 9"""
+        """semicircle = 10"""
+        """laserpointer = 11"""
+        """angle = 12"""
         pass
 
     def circle(self, x, y, radius, width, color):
@@ -263,6 +266,15 @@ class Animator:
 
     def ship_boom(self, x, y, x2, y2, frame):
         return f"9 {x} {y} {x2} {y2} {frame};"
+
+    def semicircle(self, x, y, radius, beginning, contrast):
+        return f"10 {x} {y} {radius} {beginning} {contrast};"
+
+    def laserpointer(self, x, y, angle, size):
+        return f"11 {x} {y} {angle} {size};"
+
+    def angle(self, x, y, size):
+        return f"12 {x} {y} {size};"
 
 
 if __name__ == "__main__":

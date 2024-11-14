@@ -2,7 +2,7 @@ from math import sin, cos, atan, pi, asin
 
 
 class Optic:
-    def __init__(self, x=500, y=500, length=400, angle=0):
+    def __init__(self, x=500, y=500, length=430, angle=0):
         self.base_values = [x, y, length, angle]
         self.starting_point_x = x
         self.starting_point_y = y
@@ -31,17 +31,17 @@ class Optic:
             "names": [
                 "Угол падения (в градусах)",
                 "Угол преломления",
-                "Оптическая плотность - право",
-                "Оптическая плотность - лево",
+                "Оптическая плотность - верх (1)",
+                "Оптическая плотность - низ (2)",
                 "Красный",
                 "Зелёный",
                 "Синий"
             ],
             "modifiers": [
-                "0.25",
-                "0.25",
-                "200",
-                "200",
+                "2.5",
+                "2.5",
+                "400",
+                "400",
                 "400",
                 "400",
                 "400"
@@ -49,8 +49,8 @@ class Optic:
             "shifts": [
                 "250",
                 "250",
-                "-200",
-                "-200",
+                "-400",
+                "-400",
                 "0",
                 "0",
                 "0"
@@ -82,10 +82,13 @@ class Optic:
         angl = self.get_refraction() / 180 * pi
         x2 = 1000 * cos(angl)
         y2 = -1000 * sin(angl)
-        draw_string += animator.circle(self.starting_point_x, self.starting_point_y, 150, "300", "blue")
-        draw_string += animator.circle(self.starting_point_x + x, self.starting_point_y + y, 10, "20", "black")
+        draw_string += animator.angle(self.starting_point_x, self.starting_point_y, 735)
+        draw_string += animator.semicircle(self.starting_point_x, self.starting_point_y, 300, 0, self.optic1)
+        draw_string += animator.semicircle(self.starting_point_x, self.starting_point_y, 300, 0.5, self.optic2)
         draw_string += animator.line(self.starting_point_x + x, self.starting_point_y + y, self.starting_point_x, self.starting_point_y, 4, self.get_color())
         draw_string += animator.line(self.starting_point_x + x2, self.starting_point_y + y2, self.starting_point_x, self.starting_point_y, 4, self.get_color())
+        #draw_string += animator.laserpointer(self.starting_point_x + x, self.starting_point_y + y, self.angle, 90)
+        draw_string += animator.laserpointer(self.starting_point_x + self.baseLength * cos(self.angle + pi/2), self.starting_point_y - self.baseLength * sin(self.angle + pi/2), self.angle + pi/2, 90)
         self.store_sliders()
         return draw_string
 
@@ -95,10 +98,10 @@ class Optic:
     def react_click(self, x, y):#should be in every model
         x2 = x - self.starting_point_x
         y2 = y - self.starting_point_y
-        if x2 > 0:
-            self.angle = atan(-y2 / x2)
+        if y2 <= 0:
+            self.angle = atan(x2 / y2)
         else:
-            self.set_refraction(atan(y2 / x2) / pi * 180 + 180)
+            self.set_refraction(atan(-x2 / y2) / pi * 180 + 180)
 
     def store_sliders(self):#should be in every model
         self.sliders = ""
@@ -130,18 +133,20 @@ class Optic:
             self.angle = num * pi / 180
 
     def get_refraction(self):
-        if abs(sin(self.angle) / self.optic1 * self.optic2) >= 1:
+        if abs(sin(self.angle) / self.optic2 * self.optic1) >= 1:
             a = -self.angle
-            print(self.angle)
         else:
-            a = asin(sin(self.angle) / self.optic1 * self.optic2) + pi
+            a = asin(sin(self.angle) / self.optic2 * self.optic1) + pi
         return a * 180 / pi #deg
 
     def get_refraction_public(self):
         return self.get_refraction() - 180
 
     def set_refraction(self, num):#deg
-            self.angle = asin(sin(num / 180 * pi) / self.optic2 * self.optic1)
+        try:
+            self.angle = asin(sin(num / 180 * pi) / self.optic1 * self.optic2)
+        except:
+            pass
 
     def get_optic1(self):
         return self.optic1

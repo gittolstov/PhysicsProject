@@ -9,13 +9,17 @@ class Animation{
 		this.gx = 0;
 		this.gy = 250;
 		this.masterBackgroundStyle = "white";
-		this.drawingFunctions = ["circle", "line", "vector", "scheme", "pause", "playingBack", "planet", "ship", "pendulum", "shipBoom"];
+		this.drawingFunctions = ["circle", "line", "vector", "scheme", "pause", "playingBack", "planet", "ship", "pendulum", "shipBoom", "semicircle", "laser", "angle"];
 		this.schimage = new Image;
 	    this.schimage.src = "/static/Scheme.png";
 		this.earth = new Image;
 	    this.earth.src = "/static/Planet.png";
 		this.spaceship = new Image;
 	    this.spaceship.src = "/static/Spaceship.png";
+		this.pointer = new Image;
+	    this.pointer.src = "/static/laser.png";
+		this.dial = new Image;
+	    this.dial.src = "/static/Dial.png";
 		this.goldenball = new Image;
 	    this.goldenball.src = "/static/Pendulum.png";
 		this.expl = [new Image, new Image, new Image, new Image, new Image, new Image];
@@ -98,6 +102,27 @@ class Animation{
 
 	shipBoom(args){
 	    this.masterCanvas.drawImage(this.expl[args[5]], args[1], args[2], args[3], args[4]);
+	}
+
+	semicircle(args){
+		this.masterCanvas.beginPath();
+		this.masterCanvas.arc(args[1], args[2], args[3], (parseFloat(args[4]) - 0.25) * 2 * Math.PI, (parseFloat(args[4]) + 0.25) * 2 * Math.PI);
+		this.masterCanvas.fillStyle = "rgb(" + (255 - (parseFloat(args[5]) - 1) * 150) + ", " + (255 - (parseFloat(args[5]) - 1) * 150) + ", 255)";
+		this.masterCanvas.fill();
+	}
+
+	laser(args){
+	    args[4] = parseFloat(args[4])
+	    args[3] = parseFloat(args[3])
+	    this.masterCanvas.restore();
+	    this.modifyContextMatrix(-args[3] + Math.PI/2, args[1], args[2]);
+	    this.masterCanvas.drawImage(this.pointer, -args[4] / 2, -args[4] / 2, args[4], args[4]);
+	    this.masterCanvas.restore();
+	}
+
+	angle(args){
+	    this.masterCanvas.drawImage(this.dial, args[1] - args[3] / 2, args[2] - args[3] / 2, args[3], args[3]);
+	    this.modifyContextMatrix(-Math.PI / 2, 0, 1000);
 	}
 
 	refresh(){

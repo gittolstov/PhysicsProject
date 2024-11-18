@@ -104,12 +104,11 @@ class Oscillations:
         self.log["self"]["capacitance"].append(self.capacitance)
         self.log["self"]["inductance"].append(self.inductance)
 
-    def apply_log(self, log, frame):#should be in every model, applies frames from log
-        print(log)
+    def apply_log(self, log, frame):#should be in every model, applies frames from log=
         for i in self.charges:
             i.tick_move()
         if frame >= len(log["self"]["charge"]):
-            print("frame index out of range")
+            #print("frame index out of range")
             return
         self.charge = log["self"]["charge"][frame]
         self.current = log["self"]["current"][frame]

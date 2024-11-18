@@ -19,7 +19,7 @@ class Pendulum(Vector):#representation of pendulum in memory
                 "hardset_kinetic_energy",
                 "set_speed",
                 "set_base_length",
-                "set_gravity",
+                "set_gravity_public",
                 "set_potential_energy",
                 "set_angle"
             ],
@@ -27,7 +27,7 @@ class Pendulum(Vector):#representation of pendulum in memory
                 "get_kinetic_energy",
                 "get_speed",
                 "get_base_length",
-                "get_gravity",
+                "get_gravity_public",
                 "get_potential_energy",
                 "get_angle"
             ],
@@ -43,7 +43,7 @@ class Pendulum(Vector):#representation of pendulum in memory
                 "10",
                 "20",
                 "0.5",
-                "2000",
+                "20",
                 "10",
                 "5"
             ],
@@ -134,9 +134,8 @@ class Pendulum(Vector):#representation of pendulum in memory
         self.log["full_energy"].append(self.full_energy)
 
     def apply_log(self, log, frame):#should be in every model, applies frames from log
-        print(log)
         if frame >= len(log["self"]["x"]):
-            print("frame index out of range")
+            #print("frame index out of range")
             return
         self.x = log["self"]["x"][frame]
         self.y = log["self"]["y"][frame]
@@ -214,6 +213,14 @@ class Pendulum(Vector):#representation of pendulum in memory
     def set_gravity(self, num):
         self.gravity.y = num
         self.recalculate_full_energy()
+        self.tension.revise_tension()
+
+    def get_gravity_public(self):
+        return self.gravity.length() * 100
+
+    def set_gravity_public(self, num):
+        self.gravity.y = num / 100
+        self.recalculate_full_energy()
 
     def hardset_kinetic_energy(self, num):
         self.speed.set_length(abs(num * 2) ** 0.5 * num/abs(num))
@@ -269,10 +276,14 @@ class Tension(Vector):
     def __init__(self, x, y, aux):
         super().__init__(x, y, aux)
 
-    def tick2(self):
+    def revise_tension(self):
         a = projections(self.x, self.y, self.backlink.gravity.length())
         self.set_length(-a["y"] + self.backlink.speed.length() ** 2 / self.backlink.baseLength)
         self.turn_to(-self.backlink.x, -self.backlink.y)
+
+
+    def tick2(self):
+        self.revise_tension()
 
 
 

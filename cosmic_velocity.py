@@ -185,9 +185,8 @@ class Cosmic_velocity(Vector):
         self.log["full_energy"].append(self.full_energy)
 
     def apply_log(self, log, frame):#should be in every model, applies frames from log
-        print(log)
         if frame >= len(log["self"]["x"]):
-            print("frame index out of range")
+            #print("frame index out of range")
             return
         self.x = log["self"]["x"][frame]
         self.y = log["self"]["y"][frame]
@@ -288,10 +287,12 @@ class Cosmic_velocity(Vector):
         self.time_without_interruption = self.time
         self.apogee.isDefined = False
         self.set_length(height)
+        self.gravity.revise_gravity()
     def set_height_public(self, height):
         self.time_without_interruption = self.time
         self.apogee.isDefined = False
         self.set_length(height / self.length_multiplier)
+        self.gravity.revise_gravity()
 
     def get_speed(self):
         return self.speed.length()
@@ -314,6 +315,7 @@ class Cosmic_velocity(Vector):
         self.time_without_interruption = self.time
         self.apogee.isDefined = False
         self.gMm = mass
+        self.gravity.revise_gravity()
     def set_mass_public(self, mass):
         self.set_mass(mass * self.gravitationalConstant)
 
@@ -425,7 +427,10 @@ class Gravity(Vector):
     def __init__(self, x, y, aux):
         super().__init__(x, y, aux)
 
-    def tick2(self):
+    def revise_gravity(self):
         if self.backlink.length() == 0: return
         self.set_length(self.backlink.gMm / self.backlink.length() ** 2)
         self.turn_to(-self.backlink.x, -self.backlink.y)
+
+    def tick2(self):
+        self.revise_gravity()

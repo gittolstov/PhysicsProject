@@ -213,7 +213,7 @@ class Main:
 
     def playback_frame(self):
         self.recording["frame"] += 1
-        print(self.recording["frame"])
+        #print(self.recording["frame"])
         self.model.apply_log(self.recording["object"], self.recording["frame"])
 
     def load_playback(self, name):

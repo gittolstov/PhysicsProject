@@ -85,17 +85,33 @@ class Optic:
         draw_string += animator.angle(self.starting_point_x, self.starting_point_y, 735)
         draw_string += animator.semicircle(self.starting_point_x, self.starting_point_y, 300, 0, self.optic1)
         draw_string += animator.semicircle(self.starting_point_x, self.starting_point_y, 300, 0.5, self.optic2)
-        draw_string += animator.line(self.starting_point_x + x, self.starting_point_y + y, self.starting_point_x, self.starting_point_y, 4, self.get_color())
-        draw_string += animator.line(self.starting_point_x + x2, self.starting_point_y + y2, self.starting_point_x, self.starting_point_y, 4, self.get_color())
-        #draw_string += animator.laserpointer(self.starting_point_x + x, self.starting_point_y + y, self.angle, 90)
-        draw_string += animator.laserpointer(self.starting_point_x + self.baseLength * cos(self.angle + pi/2), self.starting_point_y - self.baseLength * sin(self.angle + pi/2), self.angle + pi/2, 90)
+        draw_string += animator.line(self.starting_point_x + x,
+                                     self.starting_point_y + y,
+                                     self.starting_point_x,
+                                     self.starting_point_y, 4,
+                                     self.get_color())
+        draw_string += animator.line(self.starting_point_x + x2,
+                                     self.starting_point_y + y2,
+                                     self.starting_point_x,
+                                     self.starting_point_y, 4,
+                                     self.get_color())
+        # draw_string += animator.laserpointer(self.starting_point_x + x, self.starting_point_y + y, self.angle, 90)
+        for i in range(25):
+            draw_string += animator.line(self.starting_point_x - 500 + 40 * i,
+                                         self.starting_point_y,
+                                         self.starting_point_x - 480 + 40 * i,
+                                         self.starting_point_y, 3,
+                                         "grey")
+        draw_string += animator.laserpointer(self.starting_point_x + self.baseLength * cos(self.angle + pi/2),
+                                             self.starting_point_y - self.baseLength * sin(self.angle + pi/2),
+                                             self.angle + pi/2, 90)
         self.store_sliders()
         return draw_string
 
-    def get_working_vectors(self):#should be in every model
+    def get_working_vectors(self):  # should be in every model
         return []
 
-    def react_click(self, x, y):#should be in every model
+    def react_click(self, x, y):  # should be in every model
         x2 = x - self.starting_point_x
         y2 = y - self.starting_point_y
         if y2 <= 0:
@@ -103,7 +119,7 @@ class Optic:
         else:
             self.set_refraction(atan(-x2 / y2) / pi * 180 + 180)
 
-    def store_sliders(self):#should be in every model
+    def store_sliders(self):  # should be in every model
         self.sliders = ""
         for i in self.setters_and_getters["getters"]:
             self.sliders += i + " " + str(getattr(self, i)()) + ";"

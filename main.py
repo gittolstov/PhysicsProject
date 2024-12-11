@@ -6,7 +6,6 @@ from electromagnetic_oscillations import Oscillations
 from optic import Optic
 from log_parser import *
 import threading
-import turtle
 
 
 app = Flask(__name__)
@@ -249,7 +248,8 @@ class Animator:
     def scheme(self):
         return "3;"
 
-    def pause(self, paused):
+    @staticmethod
+    def pause(paused):
         return f"4 {paused};"
 
     def playing_back(self, x, y, radius, width, color, on, playback):
@@ -277,7 +277,7 @@ class Animator:
         return f"12 {x} {y} {size};"
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     PENDULUM = Pendulum()
     COSMIC = Cosmic_velocity()
     ELECTRO = Oscillations()
@@ -286,4 +286,4 @@ if __name__ == "__main__":
     parser = Log_parser()
     main.add_model(ELECTRO)
     main.set_timeout()
-    app.run(host='0.0.0.0', debug=False)
+    app.run('0.0.0.0')

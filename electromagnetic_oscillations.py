@@ -22,27 +22,39 @@ class Oscillations:
                 "set_current",
                 "set_period",
                 "set_charge",
+                "set_voltage",
                 "set_capacitance",
-                "set_inductance"
+                "set_inductance",
+                "set_wc",#energy
+                "set_wl"#energy
             ],
             "getters": [
                 "get_current",
                 "get_period",
                 "get_charge",
+                "get_voltage",
                 "get_capacitance",
-                "get_inductance"
+                "get_inductance",
+                "get_wc",
+                "get_wl"
             ],
             "names": [
                 "Сила тока",
                 "Период колебаний",
                 "Заряд конденсатора",
+                "Напряжение",
                 "Ёмкость конденсатора (C)",
-                "Индуктивность катушки (L)"
+                "Индуктивность катушки (L)",
+                "Энергия конденсатора",
+                "Энергия катушки"
             ],
             "modifiers": [
                 "100",
                 "0.2",
                 "0.5",
+                "100",
+                "1",
+                "1",
                 "1",
                 "1"
             ],
@@ -50,6 +62,9 @@ class Oscillations:
                 "200",
                 "0",
                 "200",
+                "200",
+                "0",
+                "0",
                 "0",
                 "0"
             ]
@@ -86,9 +101,18 @@ class Oscillations:
         elif data == "2":
             arr = self.log["self"]["charge"].copy()
         elif data == "3":
-            arr = self.log["self"]["capacitance"].copy()
+            for i in range(len(self.log["self"]["charge"])):
+                arr.append(self.log["self"]["charge"][i] / self.log["self"]["capacitance"][i])
         elif data == "4":
+            arr = self.log["self"]["capacitance"].copy()
+        elif data == "5":
             arr = self.log["self"]["inductance"].copy()
+        elif data == "6":
+            for i in range(len(self.log["self"]["charge"])):
+                arr.append(self.log["self"]["charge"][i] ** 2 / self.log["self"]["capacitance"][i] / 2)
+        elif data == "7":
+            for i in range(len(self.log["self"]["current"])):
+                arr.append(self.log["self"]["current"][i] ** 2 * self.log["self"]["inductance"][i] / 2)
         for i in range(len(arr)):
             arr[i] *= float(self.setters_and_getters["modifiers"][int(data)])
             arr[i] = str(arr[i])
@@ -181,9 +205,15 @@ class Oscillations:
     def set_charge(self, cur):
         try:
             w = 2 * math.pi / self.get_period()
-            self.periodic_time = asin(cur / w / self.base_values[2]) / w
+            self.periodic_time = acos(cur / self.base_values[2]) / w
         except:
             pass
+
+    def get_voltage(self):
+        return self.get_charge() / self.capacitance
+
+    def set_voltage(self, num):
+        self.set_charge(num * self.capacitance)
 
     def get_capacitance(self):
         return self.capacitance
@@ -207,6 +237,18 @@ class Oscillations:
         self.sliders = ""
         for i in self.setters_and_getters["getters"]:
             self.sliders += i + " " + str(getattr(self, i)()) + ";"
+
+    def get_wc(self):
+        return self.get_charge()**2 / self.capacitance / 2
+
+    def set_wc(self, num):
+        self.set_charge((num * 2 * self.capacitance) ** 0.5)
+
+    def get_wl(self):
+        return self.get_current()**2 * self.inductance / 2
+
+    def set_wl(self, num):
+        self.set_current((num * 2 / self.inductance) ** 0.5)
 
 class Charge:
     def __init__(self, backlink, potential):

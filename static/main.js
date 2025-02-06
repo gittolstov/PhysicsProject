@@ -38,7 +38,7 @@ function sendMyData(something){
 let slidersList = [];
 let lastGraph = 0;
 let slidersReceived = {time: 0}
-let lookupColors = ["red", "orange", "green", "blue", "magenta", "black", "brown", "pink"];
+let lookupColors = ["red", "orange", "green", "blue", "magenta", "black", "brown", "grey"];
 timeSlider = new TimeSlider();
 
 function receiveSliders(){

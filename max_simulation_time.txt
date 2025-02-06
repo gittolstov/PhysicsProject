@@ -1,0 +1,2 @@
+300
+The first line is the time for max simulation time in seconds, currently (probably) 5 mins

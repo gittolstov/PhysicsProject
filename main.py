@@ -23,6 +23,12 @@ def ret1():
     return main.to_draw
 
 
+@app.route("/force_crash")
+def ret10():
+    crash()
+    return "FUCK"
+
+
 @app.route("/get_sliders")
 def ret2():
     return str(main.model.time) + ";" + main.model.sliders
@@ -91,6 +97,9 @@ class Main:
             "Oscillations": ELECTRO,
             "Optic": OPTIC
         }
+        with open("max_simulation_time.txt", "r") as file:
+            t = int(file.readline()) * tickrate
+        self.time_cap = t
         self.animator = Animator()
         self.vectors = []
         self.tickrate = tickrate
@@ -102,6 +111,7 @@ class Main:
         }
         self.to_draw = ""
         self.animatimer = 0
+        self.global_timer = 0
         self.model = None
 
     def handle_event(self, event):
@@ -127,6 +137,8 @@ class Main:
             self.vectors = self.model.get_working_vectors()
         elif event == "playforth":
             self.end_playback()
+        elif event == "force_crash":
+            crash()
         elif event.startswith("slider"):
             parsed = event.split(" ")
             bar = getattr(self.model, parsed[1])
@@ -145,7 +157,7 @@ class Main:
             self.vectors = self.model.get_working_vectors()
 
     def pause(self):
-            self.paused = not self.paused
+        self.paused = not self.paused
 
     def set_timeout(self):
         self.timer = threading.Timer(1 / self.tickrate, self.tick_move, args=None, kwargs=None)
@@ -153,6 +165,13 @@ class Main:
 
     def tick_move(self):
         if not self.paused:
+            self.global_timer += 1
+            if self.global_timer > self.time_cap:
+                self.end_playback()
+                self.model.reset()
+                self.vectors = self.model.get_working_vectors()
+                self.paused = True
+                self.global_timer = 0
             if self.playingback:
                 self.playback_frame()
             else:
@@ -188,6 +207,7 @@ class Main:
     def reset_model(self, model):
         model.reset()
         self.add_model(model)
+        self.global_timer = 0
 
     def add_model(self, model):
         self.vectors = model.get_working_vectors()
@@ -217,6 +237,13 @@ class Main:
 
     def load_playback(self, name):
         self.start_playback(parser.fetch(name))
+
+
+def crash():
+    try:
+        crash()
+    except:
+        crash()
 
 
 class Animator:
